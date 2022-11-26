@@ -7,40 +7,40 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LogInScreen({ navigation }) {
     const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
+    const [password, setPassword] = useState('');
     const [openModal, setOpenModal] = useState(false);
-    const [nomeUsuario, setNomeUsuario] = useState('');
-    const [telefone, setTelefone] = useState('');
-    const [usuarioLogado, setUsuarioLogado] = useState({});
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [loggedUser, setLoggedUser] = useState({});
     const [loadingVisible, setLoadingVisible] = useState(false);
 
     useEffect(() => {
         getData();
-        if (usuarioLogado !== null && Object.keys(usuarioLogado).length > 0) {          
-            if (usuarioLogado.Tipo == 'Aluno') {
-                navigation.replace("HomeAluno", usuarioLogado)
-            } else if (usuarioLogado.Tipo == 'Professor') {
-                navigation.replace("HomeProfessor", usuarioLogado)
+        if (Object.keys(loggedUser).length > 0) {          
+            if (loggedUser.Tipo == 'Aluno') {
+                navigation.replace("HomeAluno", loggedUser)
+            } else if (loggedUser.Tipo == 'Professor') {
+                navigation.replace("HomeProfessor", loggedUser)
             }
         }
-    })
-
+    }, [loggedUser])
 
     const getData = async () => {
         try {
-            const jsonValue = await AsyncStorage.getItem('@usuarioLogadoCache')
-            setUsuarioLogado (jsonValue != null ? JSON.parse(jsonValue) : {});
+            const jsonValue = await AsyncStorage.getItem('@loggedUserCache')
+            setLoggedUser (jsonValue != null ? JSON.parse(jsonValue) : {});
         } catch (e) {
-            alert(e.message)
+            Alert.alert("Erro", e.message)
         }
     }
+
     const salvaCache = async (value) => {
         try {
             const jsonValue = JSON.stringify(value);
-            await AsyncStorage.setItem('@usuarioLogadoCache', jsonValue)
+            await AsyncStorage.setItem('@loggedUserCache', jsonValue)
 
         } catch (e) {
-            alert(e.message);
+            Alert.alert("Erro", e.message)
         }
     }
 
@@ -48,24 +48,23 @@ export default function LogInScreen({ navigation }) {
     useEffect(() => {
         const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
             if (user) {
-                if (usuarioLogado.Tipo == "Professor") {
-                    salvaCache(usuarioLogado);
+                if (loggedUser.Tipo == "Professor") {
+                    salvaCache(loggedUser);
                     setLoadingVisible(false);
-                    navigation.replace("HomeProfessor", usuarioLogado);
+                    navigation.replace("HomeProfessor", loggedUser);
                 }
-                else if (usuarioLogado.Tipo == "Aluno") {
-                    salvaCache(usuarioLogado);
+                else if (loggedUser.Tipo == "Aluno") {
+                    salvaCache(loggedUser);
                     setLoadingVisible(false);
-                    navigation.replace("HomeAluno", usuarioLogado);
+                    navigation.replace("HomeAluno", loggedUser);
                 }
             }
         })
         return unsubscribe
-    }, [usuarioLogado])
+    }, [loggedUser])
 
 
     const getUser = async () => {
-
         await bd.collection('Usuários').where("Email", "==", email)
             .get()
             .then((querySnapshot) => {
@@ -76,9 +75,10 @@ export default function LogInScreen({ navigation }) {
                         Nome: doc.data().Nome,
                         Tipo: doc.data().Tipo,
                         Email: doc.data().Email,
+                        ID_Treino: doc.data().ID_Treino
                     }
                 })
-                setUsuarioLogado(usuario_adquirido);
+                setLoggedUser(usuario_adquirido);
             })
     }
 
@@ -88,50 +88,47 @@ export default function LogInScreen({ navigation }) {
         handleLogIn();
     }
     const registrarPressed = () => {
-        if (nomeUsuario == '' || telefone == '' || email == '' || senha === '') {
+        if (name == '' || phone == '' || email == '' || password === '') {
             Alert.alert("Erro", "Por favor, preencha todos os campos")
         } else {
             setLoadingVisible(true);
-            handleSingUp();
+            handleSignUp();
         }
     }
 
     const jaTenhoContaPressed = () => {
         setEmail('');
-        setSenha('');
+        setPassword('');
         setOpenModal('false');
     }
-    const handleSingUp = () => {
+    const handleSignUp = () => {
         firebaseAuth
-            .createUserWithEmailAndPassword(email, senha)
+            .createUserWithEmailAndPassword(email, password)
             .then(userCredentials => {
                 const dadosCadastro = {
-                    Nome: nomeUsuario,
-                    Telefone: telefone,
+                    Nome: name,
+                    Telefone: phone,
                     Email: email,
                     Tipo: "Aluno",
                     ID_Treino: "",
                 }
                 const res = bd.collection('Usuários').doc(email).set(dadosCadastro);
-                const user = userCredentials.user;
-                setUsuarioLogado(dadosCadastro);
-                salvaCache(dadosCadastro);
-
+                handleLogIn()
             })
             .catch(error => {
-                alert(tradutor(error.code, error.message))
+                Alert.alert("Erro",tradutor(error.code, error.message))
                 setLoadingVisible(false)
             })
     }
     const handleLogIn = () => {
         firebaseAuth
-            .signInWithEmailAndPassword(email, senha)
+            .signInWithEmailAndPassword(email, password)
             .then(userCredentials => {
                 getUser();
                 const user = userCredentials.user;
             })
             .catch(error => {
-                alert(tradutor(error.code, error.message));
+                Alert.alert("Erro",tradutor(error.code, error.message))
                 setLoadingVisible(false);
             })
     }
@@ -139,28 +136,27 @@ export default function LogInScreen({ navigation }) {
         setLoadingVisible(true);
         firebaseAuth.sendPasswordResetEmail(email)
             .then(() => {
-                alert('Verifique sua caixa de e-mail.');
+                Alert.alert("Redefinição de Senha","Verifique sua caixa de e-mail")
                 setLoadingVisible(false);
 
             })
             .catch((error) => {
                 setLoadingVisible(false)
-                alert(tradutor(error.code, error.message))
+                Alert.alert("Erro",tradutor(error.code, error.message))
 
             });
     }
-
-
     return (
 
         <KeyboardAvoidingView
             style={styles.container}
-            behavior="padding">
+            behavior="padding"
+            >
             <Loading visible={loadingVisible} />
 
-            <Image
-                style={styles.logo}
-                source={require('../assets/logo.jpg')} />
+            <Image 
+                source={require('../assets/logo.jpg')}
+                style={styles.logo} />
             <View style={styles.inputContainer}>
                 <TextInput
                     placeholder="Email"
@@ -172,8 +168,8 @@ export default function LogInScreen({ navigation }) {
                 />
                 <TextInput
                     placeholder="Senha"
-                    value={senha}
-                    onChangeText={text => setSenha(text)}
+                    value={password}
+                    onChangeText={text => setPassword(text)}
                     style={styles.input}
                     secureTextEntry
                 />
@@ -198,18 +194,18 @@ export default function LogInScreen({ navigation }) {
             <Modal animationType="slide" transparent={true} visible={openModal}>
                 <View style={styles.modalRegistro}>
                     <Image
-                        style={styles.logo}
-                        source={require('../assets/logo.jpg')} />
+                        source={require('../assets/logo.jpg')}
+                        style={styles.logo} />
                     <TextInput
                         placeholder="Nome"
-                        value={nomeUsuario}
-                        onChangeText={text => setNomeUsuario(text)}
+                        value={name}
+                        onChangeText={text => setName(text)}
                         style={styles.input} />
                     <TextInput
                         placeholder="Telefone"
-                        value={telefone}
+                        value={phone}
                         keyboardType="numeric"
-                        onChangeText={text => setTelefone(text)}
+                        onChangeText={text => setPhone(text)}
                         style={styles.input} />
                     <TextInput
                         placeholder="Email"
@@ -218,8 +214,8 @@ export default function LogInScreen({ navigation }) {
                         style={styles.input} />
                     <TextInput
                         placeholder="Senha"
-                        value={senha}
-                        onChangeText={text => setSenha(text)}
+                        value={password}
+                        onChangeText={text => setPassword(text)}
                         style={styles.input}
                         secureTextEntry />
                     <TouchableOpacity
@@ -266,7 +262,7 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
     button: {
-        backgroundColor: "yellow",
+        backgroundColor: "#F7C724",
         width: "100%",
         padding: 15,
         borderRadius: 10,
@@ -282,11 +278,11 @@ const styles = StyleSheet.create({
     buttonOutline: {
         backgroundColor: "black",
         marginTop: 5,
-        borderColor: "yellow",
+        borderColor: "#F7C724",
         borderWidth: 2
     },
     buttonOutlineText: {
-        color: "yellow",
+        color: "#F7C724",
         fontWeight: '700',
         fontSize: 16,
     },
@@ -300,7 +296,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonRegister: {
-        backgroundColor: "yellow",
+        backgroundColor: "#F7C724",
         width: "100%",
         padding: 15,
         borderRadius: 10,
@@ -314,7 +310,10 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 10,
         fontWeight: '700',
-
+    },
+    logo:{
+        width: '50%',
+        resizeMode: 'contain'
 
     }
 })

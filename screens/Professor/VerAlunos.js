@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Modal, Text, StyleSheet, ScrollView, TouchableOpacity, Alert} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import { firestore as bd } from '../../firebase'
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function VerAlunos({navigation}) {
     const [alunos, setAlunos] = useState([]);
     const [filteredAlunos, setFilteredAlunos] = useState([]);
-    const [visibleModal, setVisibleModal] = useState(false);
-    const [pressedAluno, setPressedAluno] = useState({});
+
 
     useEffect(() => {
         navigation.setOptions({
@@ -48,7 +47,7 @@ export default function VerAlunos({navigation}) {
                 setAlunos(usuarios_adquiridos);
                 setFilteredAlunos(usuarios_adquiridos);
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro",error.code, error.message)
             })
     }
 
@@ -83,7 +82,7 @@ export default function VerAlunos({navigation}) {
     const apertouAluno = ((aluno_clicado) => {
         Alert.alert(
             "Selecione uma opção",
-            "Você deseja editar ficha do aluno ou excluir o aluno?",
+            "Você deseja editar a ficha do aluno ou excluir o aluno?",
             [
                 { text: "Cancelar", onPress: (() => { }) },
                 {
@@ -95,22 +94,23 @@ export default function VerAlunos({navigation}) {
                 {
                     text: "Excluir", onPress: (() => {
                         Alert.alert(
-                            "Tem certeza que deseja excluir o aluno?", "",
+                            "Confirmação de exclusão", "Tem certeza que deseja excluir o aluno?", 
                             [
+                                { text: "CANCELAR", onPress: (() => { }) },
                                 {
-                                    text: "Sim",
+                                    text: "SIM",
                                     onPress: (() => {
                                         try{
                                             const res = bd.collection('Usuários').doc(aluno_clicado.id).delete();
-                                            alert("Usuário excluído com sucesso");
+                                            Alert.alert("Sucesso", "Aluno excluído com sucesso");
                                             navigation.goBack();
 
                                         }catch(e){
-                                            alert(e.message)
+                                            Alert.alert("Erro", e.message)
                                         }
                                     }),
                                 },
-                                { text: "Não", onPress: (() => { }) },
+                                
                             ]
                         );
                     })
@@ -133,9 +133,9 @@ export default function VerAlunos({navigation}) {
                         <View>
                             <Text style={styles.textName}>{item.Nome}</Text>
                             <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems:'center', marginLeft: 10,}}>
-                            <Ionicons name="at-outline" size={15} color="yellow" />
+                            <Ionicons name="at-outline" size={15} color="#F7C724" />
                                 <Text style={styles.textEmail}>{item.Email}   </Text>
-                                <Ionicons name="call-outline" size={15} color="yellow" />
+                                <Ionicons name="call-outline" size={15} color="#F7C724" />
                                 <Text style={styles.textEmail}>{item.Telefone}</Text>
                             </View>
                             {treinoAluno(item.Treino)}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Modal, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Modal, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {firestore as bd} from "../firebase"
@@ -32,7 +32,7 @@ export default function DialogEditarTreino(props) {
                 Tipo: props.Aluno.Tipo
             }
             const res = bd.collection('Usuários').doc(props.Aluno.Email).set(dadosCadastro);
-            alert("Ficha atribuida à aluno com sucesso")
+            Alert.alert("Sucesso","Ficha atribuida à aluno com sucesso")
             props.Fechar()
         })
         return (
@@ -110,7 +110,7 @@ export default function DialogEditarTreino(props) {
     
         },
         saveButton:{
-            backgroundColor: 'yellow',
+            backgroundColor: '#F7C724',
             alignSelf: 'center',
             alignItems: 'center',
             padding: 20,

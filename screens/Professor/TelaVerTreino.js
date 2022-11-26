@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert} from 'react-native';
-import DropDownPicker from "react-native-dropdown-picker";
-import { firestore as bd } from '../../firebase';
+import React, { useEffect } from "react";
+import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TelaVerTreino({route, navigation}) {
@@ -16,106 +14,49 @@ export default function TelaVerTreino({route, navigation}) {
             textAlign: 'center',
         })
     })
+
+    const verificaDia = ((dia, arrayDia) => {
+        if (arrayDia != undefined) {
+            return (
+                <View style={styles.viewDias}>
+                    <Text style={styles.textoDias}>{dia}</Text>
+                    {listaExercicio(arrayDia)}
+                </View>
+            )
+        }
+
+    })
+
+    const listaExercicio = ((array)=> {
+        return(
+            <View>
+            {array.map((item, index) => {
+                return (
+                    <View key={index} style={{width: '100%'}}>
+                        <View style={styles.itemContainer} onPress={() => {}}>
+                            <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
+                            <View style={{flexDirection:'column'}}>
+                            <Text style={styles.textName}>{item.Exercicio}</Text>
+                            <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                            </View>
+                        </View>
+                        
+                    </View>
+                )
+            })}
+            </View>
+        )
+    }) 
     
     return (
         <ScrollView style={styles.scrollview}>
             <View style={styles.view}>
             <Text style={{color: 'white', fontSize: 20, fontWeight: 'bold'}}>Nome da Ficha: {fichaEditada.Nome}</Text> 
-            <View style={styles.viewDias}>
-            <Text style={styles.textoDias}>Segunda</Text>
-
-            {
-                fichaEditada.Segunda.map((item, index) => {
-                    return (
-                        <View key={index} style={{width: '100%'}}>
-                            <View style={styles.itemContainer} onPress={() => {}}>
-                                <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
-                                <View style={{flexDirection:'column'}}>
-                                <Text style={styles.textName}>{item.Exercicio}</Text>
-                                <Text style={styles.textDescricao}>{item.Descricao}</Text>
-                                </View>
-                            </View>
-                            
-                        </View>
-                    )
-                })}
-            </View>
-            <View style={styles.viewDias}>
-            <Text style={styles.textoDias}>Terça</Text>
-
-            {
-                fichaEditada.Terca.map((item, index) => {
-                    return (
-                        <View key={index} style={{width: '100%'}}>
-                            <View style={styles.itemContainer} onPress={() => {}}>
-                                <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
-                                <View style={{flexDirection:'column'}}>
-                                <Text style={styles.textName}>{item.Exercicio}</Text>
-                                <Text style={styles.textDescricao}>{item.Descricao}</Text>
-                                </View>
-                            </View>
-                            
-                        </View>
-                    )
-                })}
-            </View>
-            <View style={styles.viewDias}>
-            <Text style={styles.textoDias}>Quarta</Text>
-
-            {
-                fichaEditada.Quarta.map((item, index) => {
-                    return (
-                        <View key={index} style={{width: '100%'}}>
-                            <View style={styles.itemContainer} onPress={() => {}}>
-                                <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
-                                <View style={{flexDirection:'column'}}>
-                                <Text style={styles.textName}>{item.Exercicio}</Text>
-                                <Text style={styles.textDescricao}>{item.Descricao}</Text>
-                                </View>
-                            </View>
-                            
-                        </View>
-                    )
-                })}
-            </View>
-            <View style={styles.viewDias}>
-            <Text style={styles.textoDias}>Quinta</Text>
-
-            {
-                fichaEditada.Quinta.map((item, index) => {
-                    return (
-                        <View key={index} style={{width: '100%'}}>
-                            <View style={styles.itemContainer} onPress={() => {}}>
-                                <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
-                                <View style={{flexDirection:'column'}}>
-                                <Text style={styles.textName}>{item.Exercicio}</Text>
-                                <Text style={styles.textDescricao}>{item.Descricao}</Text>
-                                </View>
-                            </View>
-                            
-                        </View>
-                    )
-                })}
-            </View>
-            <View style={styles.viewDias}>
-            <Text style={styles.textoDias}>Sexta</Text>
-
-            {
-                fichaEditada.Sexta.map((item, index) => {
-                    return (
-                        <View key={index} style={{width: '100%'}}>
-                            <View style={styles.itemContainer} onPress={() => {}}>
-                                <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
-                                <View style={{flexDirection:'column'}}>
-                                <Text style={styles.textName}>{item.Exercicio}</Text>
-                                <Text style={styles.textDescricao}>{item.Descricao}</Text>
-                                </View>
-                            </View>
-                            
-                        </View>
-                    )
-                })}
-            </View>
+            {verificaDia("Segunda",fichaEditada.Segunda)}
+            {verificaDia("Terça",fichaEditada.Terca)}
+            {verificaDia("Quarta",fichaEditada.Quarta)}
+            {verificaDia("Quinta",fichaEditada.Quinta)}
+            {verificaDia("Sexta",fichaEditada.Sexta)}
             </View>
         </ScrollView>
     )

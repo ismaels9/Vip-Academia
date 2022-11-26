@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert} from 'react-native';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert, Button } from 'react-native';
 import DropDownPicker from "react-native-dropdown-picker";
 import { firestore as bd } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function TelaEditarTreino({route, navigation}) {
+export default function TelaEditarTreino({ route, navigation }) {
     const fichaEditada = route.params
     const [nomeFicha, setNomeFicha] = useState(fichaEditada.Nome)
     const [dias, setDias] = useState([{ label: "Segunda", value: "Segunda" }, { label: "Terça", value: "Terca" }, { label: "Quarta", value: "Quarta" }, { label: "Quinta", value: "Quinta" }, { label: "Sexta", value: "Sexta" }])
@@ -29,13 +29,15 @@ export default function TelaEditarTreino({route, navigation}) {
 
     useEffect(() => {
         navigation.setOptions({
-            headerLargeTitle: true,
+            headerLargeTitle: false,
             headerTitle: "Editar ficha de treino",
             headerTitleAlign: 'center',
             textAlign: 'center',
         })
             , []
     })
+
+
     useEffect(() => {
         getListaExerciciosBiceps()
         getListaExerciciosCostas()
@@ -62,7 +64,7 @@ export default function TelaEditarTreino({route, navigation}) {
                 listaCompleta.push(Biceps)
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosCostas = async () => {
@@ -82,7 +84,7 @@ export default function TelaEditarTreino({route, navigation}) {
 
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosPerna = async () => {
@@ -103,7 +105,7 @@ export default function TelaEditarTreino({route, navigation}) {
                 listaCompleta.push(Perna)
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosPeito = async () => {
@@ -121,7 +123,7 @@ export default function TelaEditarTreino({route, navigation}) {
                 })
                 listaCompleta.push(Peito)
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosOmbro = async () => {
@@ -140,7 +142,7 @@ export default function TelaEditarTreino({route, navigation}) {
 
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
 
@@ -158,7 +160,7 @@ export default function TelaEditarTreino({route, navigation}) {
                 })
                 listaCompleta.push(Triceps)
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
 
     }
@@ -237,50 +239,50 @@ export default function TelaEditarTreino({route, navigation}) {
         return (
             <Modal transparent visible={visibleModal}>
                 <View style={styles.modal}>
-                <View style={styles.viewModal}>
-                    
-                    <TouchableOpacity onPress={() => setVisibleModal(false)}>
-                        <Ionicons name="close-outline" size={27} color='white' style={{ alignSelf: 'flex-end' }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontWeight: 'bold', fontSize: 18, alignSelf: 'center', color: 'white', marginBottom: 20 }}>Remover exercícios adicionados</Text>
+                    <View style={styles.viewModal}>
 
-                    <Text style={{ fontWeight: 'bold', fontSize: 16, alignSelf: 'center', color: 'white', marginBottom: 5 }}>Selecione o dia</Text>
-                    <DropDownPicker style={styles.dropdown}
-                        placeholder=""
-                        open={openModal}
-                        value={valueModal}
-                        items={dias}
-                        setOpen={setOpenModal}
-                        setValue={setValueModal}
-                        theme='LIGHT'
-                        onChangeValue={redefiniLista}
-                    />
-                    <ScrollView style={styles.scroll}>
-                        <Text style={styles.textExercicio}>
-                            Exercicios cadastrados para {valueModal.toLowerCase()}
-                        </Text>
-                        {listaModal.map((item, index) => {
-                            return (
+                        <TouchableOpacity onPress={() => setVisibleModal(false)}>
+                            <Ionicons name="close-outline" size={27} color='white' style={{ alignSelf: 'flex-end' }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontWeight: 'bold', fontSize: 18, alignSelf: 'center', color: 'white', marginBottom: 20 }}>Remover exercícios adicionados</Text>
 
-                                <View key={index} style={{
-                                    flexDirection: 'row',
-                                    marginTop: 10,
-                                    marginLeft: 10,
-                                }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 16, alignSelf: 'center', color: 'white', marginBottom: 5 }}>Selecione o dia</Text>
+                        <DropDownPicker style={styles.dropdown}
+                            placeholder=""
+                            open={openModal}
+                            value={valueModal}
+                            items={dias}
+                            setOpen={setOpenModal}
+                            setValue={setValueModal}
+                            theme='LIGHT'
+                            onChangeValue={redefiniLista}
+                        />
+                        <ScrollView style={styles.scroll}>
+                            <Text style={styles.textExercicio}>
+                                Exercícios cadastrados para {valueModal.toLowerCase()}
+                            </Text>
+                            {listaModal.map((item, index) => {
+                                return (
 
-                                    <View>
-                                        <Text style={styles.textName}>{item.Exercicio}</Text>
-                                        <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                                    <View key={index} style={{
+                                        flexDirection: 'row',
+                                        marginTop: 10,
+                                        marginLeft: 10,
+                                    }}>
+
+                                        <View>
+                                            <Text style={styles.textName}>{item.Exercicio}</Text>
+                                            <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                                        </View>
+                                        <TouchableOpacity style={{ marginLeft: 15, alignItems: "flex-end" }} onPress={() => { removerItem(item) }}>
+                                            <Ionicons name="close-circle-outline" size={27} color='red' style={{ marginLeft: 0, }} />
+                                        </TouchableOpacity>
+
                                     </View>
-                                    <TouchableOpacity style={{marginLeft: 15, alignItems:"flex-end" }} onPress={()=>{removerItem(item)}}>
-                                    <Ionicons name="close-circle-outline" size={27} color='red' style={{marginLeft: 0, }} />
-                                    </TouchableOpacity>
 
-                                </View>
-
-                            )
-                        })}
-                    </ScrollView>
+                                )
+                            })}
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>
@@ -290,65 +292,67 @@ export default function TelaEditarTreino({route, navigation}) {
     const removerItem = ((item) => {
         Alert.alert(
             "Remoção de item",
-            "Tem certeza que deseja remover o exercicio?",
+            "Tem certeza que deseja remover o exercício?",
             [
-              {
-                text: "Cancel",
-                style: "cancel"
-              },
-              { text: "OK", onPress: () => {
-                let aux = listaModal;
-                aux.splice(aux.indexOf(item), 1);
-                let aux1 = exerciciosAdicionados;
-                switch (valueModal) {
-                    case 'Segunda':
-                        aux1[0] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
-                    case 'Terca':
-                        aux1[1] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
-                    case 'Quarta':
-                        aux1[2] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
-                    case 'Quinta':
-                        aux1[3] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista()
-                        break;
-                    case 'Sexta':
-                        aux1[4] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Sim", onPress: () => {
+                        let aux = listaModal;
+                        aux.splice(aux.indexOf(item), 1);
+                        let aux1 = exerciciosAdicionados;
+                        switch (valueModal) {
+                            case 'Segunda':
+                                aux1[0] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                            case 'Terca':
+                                aux1[1] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                            case 'Quarta':
+                                aux1[2] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                            case 'Quinta':
+                                aux1[3] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista()
+                                break;
+                            case 'Sexta':
+                                aux1[4] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                        }
+                    }
                 }
-              } }
             ]
-          );
+        );
 
     })
 
     const AdicionarExercicioPressed = (() => {
         if (nomeFicha == '') {
-            alert("Preencha o campo Nome da Ficha")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Nome da Ficha")
         } else if (valueDias == '') {
-            alert("Preencha o campo Dia")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Dia")
         } else if (valueGM == '') {
-            alert("Preencha o campo Grupo Muscular")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Grupo Muscular")
         } else if (valueEx == '') {
-            alert("Preencha o campo Exercício")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Exercício")
         } else if (descricao == '') {
-            alert("Preencha o campo Descrição do Treino")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Descrição do Treino")
         } else {
             let exerciciosAux = exerciciosAdicionados;
             let exercicio = {
@@ -375,22 +379,22 @@ export default function TelaEditarTreino({route, navigation}) {
             setExerciciosAdicionados(exerciciosAux);
             setEditarNome(false);
             setValueEx('');
-            alert("Exercicio adicionado");
+            Alert.alert("Sucesso", "Exercicio adicionado");
         }
     })
 
     const EditarExercicioPressed = (() => {
         if (exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0) {
-            alert("Nenhum exercício adicionado!")
+            Alert.alert("Nenhum exercício adicionado!", "Adicione um exercicio primeiro")
         } else {
             setVisibleModal(true);
         }
 
     })
-    
+
     const salvarPressed = (() => {
-        if(exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0){
-            alert("Adicione ao menos um exercício antes de salvar a ficha")
+        if (exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0) {
+            Alert.alert("Nenhum exercício adicionado!", "Adicione ao menos um exercício antes de salvar a ficha")
         } else {
             let objetoAux = {
                 Nome: nomeFicha,
@@ -401,12 +405,13 @@ export default function TelaEditarTreino({route, navigation}) {
                 Sexta: exerciciosAdicionados[4]
             }
             const res = bd.collection('Fichas').doc(nomeFicha).set(objetoAux);
-            alert("FICHA SALVA COM SUCESSO");
+            Alert.alert("Sucesso", "Ficha salva com sucesso");
             navigation.goBack();
-            
+
         }
     })
     return (
+
         <View style={styles.view}>
             <Text style={styles.label}>Nome da Ficha</Text>
             <TextInput
@@ -470,7 +475,7 @@ export default function TelaEditarTreino({route, navigation}) {
                 </TouchableOpacity>
             </View>
             <View style={styles.viewBotoes}>
-                <TouchableOpacity style={styles.saveButton} onPress={() => {salvarPressed()}}>
+                <TouchableOpacity style={styles.saveButton} onPress={() => { salvarPressed() }}>
                     <Text style={styles.saveButtonText}>
                         SALVAR
                     </Text>
@@ -493,7 +498,6 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
         backgroundColor: "black",
         alignItems: 'center',
-        justifyContent: 'center'
     },
     input: {
         backgroundColor: "white",
@@ -507,7 +511,7 @@ const styles = StyleSheet.create({
 
     },
     saveButton: {
-        backgroundColor: "yellow",
+        backgroundColor: "#F7C724",
         padding: 10,
         borderRadius: 10,
         alignItems: 'center',
@@ -560,7 +564,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '90%',
         alignSelf: 'center',
-        borderRadius: 20, 
+        borderRadius: 20,
         padding: 15
 
     },
@@ -571,7 +575,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginBottom: 10
     },
-    modal:{
+    modal: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',

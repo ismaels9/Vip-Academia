@@ -3,11 +3,10 @@ import { View, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, Alert } fr
 import { firestore as bd } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-
-
-
 export default function EditarTreino({ navigation }) {
     const [fichas, setFichas] = useState([])
+    const [filteredFichas, setFilteredFichas] = useState([]);
+
 
     useEffect(() => {
         getFichas()
@@ -17,10 +16,29 @@ export default function EditarTreino({ navigation }) {
         navigation.setOptions({
             headerLargeTitle: true,
             headerTitle: "Editar fichas de treino",
-            headerTitleAlign: 'center',
-            textAlign: 'center',
+            headerSearchBarOptions: {
+                placeholder: "Digite o nome da Ficha",
+                headerIconColor: 'white',
+                textColor: 'gray',
+                onChangeText: (event) => {
+                    searchFilterFunction(event.nativeEvent.text);
+                },
+            },
         })
     })
+    const searchFilterFunction = (text) => {
+        if (text) {
+            const newData = fichas.filter(item => {
+                const itemData = item.Nome ? item.Nome.toUpperCase() : ''.toUpperCase();
+                const textData = text.toUpperCase();
+                return itemData.indexOf(textData) > -1;
+            })
+            setFilteredFichas(newData);
+
+        } else {
+            setFilteredFichas(fichas);
+        }
+    }
 
     const getFichas = async () => {
         await bd.collection('Fichas')
@@ -41,18 +59,21 @@ export default function EditarTreino({ navigation }) {
                 })
                 if (fichas_adquiridas.length > 0) {
                     setFichas(fichas_adquiridas);
+                    setFilteredFichas(fichas_adquiridas);
+
                 }
                 else {
-                    alert("VOCÊ NÃO POSSUI FICHAS CADASTRADAS")
+                    Alert.alert("Sem ficha cadastradas", "Não existem fichas cadastradas")
                     navigation.goBack();
 
                 }
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
 
     const apertouFicha = ((ficha_clicada) => {
+        console.log(ficha_clicada)
         Alert.alert(
             "Selecione uma opção",
             "Você deseja ver ou editar a ficha?",
@@ -75,24 +96,33 @@ export default function EditarTreino({ navigation }) {
 
     })
 
-    const apertouExcluir = (() => {
+    const apertouExcluir = ((ficha_clicada) => {
         Alert.alert(
-            "Tem certeza que deseja excluir a ficha?", "",
+            "Exclusão de ficha", "Tem certeza que deseja excluir a ficha?",
             [
+                { text: "CANCELAR", onPress: (() => { }) },
                 {
-                    text: "Sim",
+                    text: "SIM",
                     onPress: (() => {
-                        try{
-                            const res = bd.collection('Fichas').doc(ficha_clicada.id).delete();
-                            alert("Ficha excluída com sucesso");
+                        try{ 
+                            const res = bd.collection('Fichas').doc(ficha_clicada.id).delete();       
+                            bd.collection('Usuários').where("ID_Treino", "==", ficha_clicada.id)
+                        .get()
+                        .then((querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                doc.ref.update({ID_Treino: ""});
+                            }
+                            )
+                        })
+                            Alert.alert("Sucesso","Ficha excluída com sucesso");
                             navigation.goBack();
 
                         }catch(e){
-                            alert(e.message)
+                            Alert.alert("Erro" ,e.message)
                         }
                     }),
                 },
-                { text: "Não", onPress: (() => { }) },
+                
             ]
         );
     })
@@ -103,7 +133,7 @@ export default function EditarTreino({ navigation }) {
                 Fichas
             </Text>
             {
-                fichas.map((item, index) => {
+                filteredFichas.map((item, index) => {
                     return (
                         <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                             <TouchableOpacity style={styles.itemContainer} onPress={() => apertouFicha(item)}>

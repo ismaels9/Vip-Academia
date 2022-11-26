@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Modal, Text, TouchableOpacity, StyleSheet,TextInput } from 'react-native';
+import { View, Modal, Text, TouchableOpacity, StyleSheet,Alert} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {firestore as bd} from "../firebase"
@@ -24,15 +24,8 @@ export default function DialogWithList(props) {
         },[]);
 
         const salvarButton = ((value) => {
-            const dadosCadastro = {
-                Email: props.Aluno.Email,
-                ID_Treino : value,
-                Nome: props.Aluno.Nome,
-                Telefone: props.Aluno.Telefone,
-                Tipo: props.Aluno.Tipo
-            }
-            const res = bd.collection('Usuários').doc(props.Aluno.Email).set(dadosCadastro);
-            alert("Ficha atribuida à aluno com sucesso")
+            bd.collection('Usuários').doc(props.Aluno.Email).update({ID_Treino: value});
+            Alert.alert("Treino Alterado","Ficha atribuida à aluno com sucesso")
             props.Fechar()
         })
         return (
@@ -110,17 +103,20 @@ export default function DialogWithList(props) {
     
         },
         saveButton:{
-            backgroundColor: 'yellow',
+            backgroundColor: '#F7C724',
             alignSelf: 'center',
             alignItems: 'center',
-            padding: 20,
+            paddingLeft: 20,
+            paddingBottom: 15,
+            paddingRight: 20,
+            paddingTop: 15,
             borderRadius: 10,
             marginTop: 20,
             justifyContent:'center',
         },
         saveButtonText:{
             alignSelf: 'center',
-            fontWeight: '500',
+            fontWeight: '700',
             fontSize: 15 
         }
     });

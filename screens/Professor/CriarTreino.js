@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert} from 'react-native';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert, KeyboardAvoidingView } from 'react-native';
 import DropDownPicker from "react-native-dropdown-picker";
 import { firestore as bd } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -60,7 +60,7 @@ export default function CriarTreino({ navigation }) {
                 listaCompleta.push(Biceps)
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosCostas = async () => {
@@ -80,7 +80,7 @@ export default function CriarTreino({ navigation }) {
 
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosPerna = async () => {
@@ -101,7 +101,7 @@ export default function CriarTreino({ navigation }) {
                 listaCompleta.push(Perna)
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosPeito = async () => {
@@ -119,7 +119,7 @@ export default function CriarTreino({ navigation }) {
                 })
                 listaCompleta.push(Peito)
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const getListaExerciciosOmbro = async () => {
@@ -138,7 +138,7 @@ export default function CriarTreino({ navigation }) {
 
 
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
 
@@ -156,7 +156,7 @@ export default function CriarTreino({ navigation }) {
                 })
                 listaCompleta.push(Triceps)
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
 
     }
@@ -192,7 +192,7 @@ export default function CriarTreino({ navigation }) {
         if (valueGM != "" && exercicios.length > 0) {
             return (
                 <View>
-                    <Text style={styles.label}>Selecione o Exercicio</Text>
+                    <Text style={styles.label}>Selecione o Exercício</Text>
                     <DropDownPicker style={styles.dropdown}
                         placeholder=""
                         open={openEx}
@@ -236,50 +236,50 @@ export default function CriarTreino({ navigation }) {
         return (
             <Modal transparent visible={visibleModal}>
                 <View style={styles.modal}>
-                <View style={styles.viewModal}>
-                    
-                    <TouchableOpacity onPress={() => setVisibleModal(false)}>
-                        <Ionicons name="close-outline" size={27} color='white' style={{ alignSelf: 'flex-end' }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontWeight: 'bold', fontSize: 18, alignSelf: 'center', color: 'white', marginBottom: 20 }}>Remover exercícios adicionados</Text>
+                    <View style={styles.viewModal}>
 
-                    <Text style={{ fontWeight: 'bold', fontSize: 16, alignSelf: 'center', color: 'white', marginBottom: 5 }}>Selecione o dia</Text>
-                    <DropDownPicker style={styles.dropdown}
-                        placeholder=""
-                        open={openModal}
-                        value={valueModal}
-                        items={dias}
-                        setOpen={setOpenModal}
-                        setValue={setValueModal}
-                        theme='LIGHT'
-                        onChangeValue={redefiniLista}
-                    />
-                    <ScrollView style={styles.scroll}>
-                        <Text style={styles.textExercicio}>
-                            Exercicios cadastrados para {valueModal.toLowerCase()}
-                        </Text>
-                        {listaModal.map((item, index) => {
-                            return (
+                        <TouchableOpacity onPress={() => setVisibleModal(false)}>
+                            <Ionicons name="close-outline" size={27} color='white' style={{ alignSelf: 'flex-end' }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontWeight: 'bold', fontSize: 18, alignSelf: 'center', color: 'white', marginBottom: 20 }}>Remover exercícios adicionados</Text>
 
-                                <View key={index} style={{
-                                    flexDirection: 'row',
-                                    marginTop: 10,
-                                    marginLeft: 10,
-                                }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 16, alignSelf: 'center', color: 'white', marginBottom: 5 }}>Selecione o dia</Text>
+                        <DropDownPicker style={styles.dropdown}
+                            placeholder=""
+                            open={openModal}
+                            value={valueModal}
+                            items={dias}
+                            setOpen={setOpenModal}
+                            setValue={setValueModal}
+                            theme='LIGHT'
+                            onChangeValue={redefiniLista}
+                        />
+                        <ScrollView style={styles.scroll}>
+                            <Text style={styles.textExercicio}>
+                                ExercÍcios cadastrados para {valueModal.toLowerCase()}
+                            </Text>
+                            {listaModal.map((item, index) => {
+                                return (
 
-                                    <View>
-                                        <Text style={styles.textName}>{item.Exercicio}</Text>
-                                        <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                                    <View key={index} style={{
+                                        flexDirection: 'row',
+                                        marginTop: 10,
+                                        marginLeft: 10,
+                                    }}>
+
+                                        <View>
+                                            <Text style={styles.textName}>{item.Exercicio}</Text>
+                                            <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                                        </View>
+                                        <TouchableOpacity style={{ marginLeft: 15, alignItems: "flex-end" }} onPress={() => { removerItem(item) }}>
+                                            <Ionicons name="close-circle-outline" size={27} color='red' style={{ marginLeft: 0, }} />
+                                        </TouchableOpacity>
+
                                     </View>
-                                    <TouchableOpacity style={{marginLeft: 15, alignItems:"flex-end" }} onPress={()=>{removerItem(item)}}>
-                                    <Ionicons name="close-circle-outline" size={27} color='red' style={{marginLeft: 0, }} />
-                                    </TouchableOpacity>
 
-                                </View>
-
-                            )
-                        })}
-                    </ScrollView>
+                                )
+                            })}
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>
@@ -291,68 +291,71 @@ export default function CriarTreino({ navigation }) {
             "Remoção de item",
             "Tem certeza que deseja remover o exercicio?",
             [
-              {
-                text: "Cancel",
-                style: "cancel"
-              },
-              { text: "OK", onPress: () => {
-                let aux = listaModal;
-                aux.splice(aux.indexOf(item), 1);
-                let aux1 = exerciciosAdicionados;
-                switch (valueModal) {
-                    case 'Segunda':
-                        aux1[0] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
-                    case 'Terca':
-                        aux1[1] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
-                    case 'Quarta':
-                        aux1[2] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
-                    case 'Quinta':
-                        aux1[3] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista()
-                        break;
-                    case 'Sexta':
-                        aux1[4] = aux;
-                        setExerciciosAdicionados(aux1);
-                        setListaModal([]);
-                        redefiniLista();
-                        break;
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Sim", onPress: () => {
+                        let aux = listaModal;
+                        aux.splice(aux.indexOf(item), 1);
+                        let aux1 = exerciciosAdicionados;
+                        switch (valueModal) {
+                            case 'Segunda':
+                                aux1[0] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                            case 'Terca':
+                                aux1[1] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                            case 'Quarta':
+                                aux1[2] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                            case 'Quinta':
+                                aux1[3] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista()
+                                break;
+                            case 'Sexta':
+                                aux1[4] = aux;
+                                setExerciciosAdicionados(aux1);
+                                setListaModal([]);
+                                redefiniLista();
+                                break;
+                        }
+                    }
                 }
-              } }
             ]
-          );
+        );
 
     })
 
     const AdicionarExercicioPressed = (() => {
         if (nomeFicha == '') {
-            alert("Preencha o campo Nome da Ficha")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Nome da Ficha")
         } else if (valueDias == '') {
-            alert("Preencha o campo Dia")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Dia")
         } else if (valueGM == '') {
-            alert("Preencha o campo Grupo Muscular")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Grupo Muscular")
         } else if (valueEx == '') {
-            alert("Preencha o campo Exercício")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Exercício")
         } else if (descricao == '') {
-            alert("Preencha o campo Descrição do Treino")
+            Alert.alert("Preencha todos os campos", "Preencha o campo Descrição do Treino")
         } else {
             let exerciciosAux = exerciciosAdicionados;
             let exercicio = {
                 Exercicio: valueEx,
-                Descricao: descricao
+                Descricao: descricao,
+                GrupoMuscular: valueGM
             }
             switch (valueDias) {
                 case 'Segunda':
@@ -374,14 +377,14 @@ export default function CriarTreino({ navigation }) {
             setExerciciosAdicionados(exerciciosAux);
             setEditarNome(false);
             setValueEx('');
-            alert("Exercicio adicionado");
+            Alert.alert("Ficha Alterada", "Exercício adicionado");
         }
 
     })
 
     const EditarExercicioPressed = (() => {
         if (exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0) {
-            alert("Nenhum exercício adicionado!")
+            Alert.alert("Nenhum exercício adicionado!", "Adicione um exercício primeiro")
         } else {
             setVisibleModal(true);
 
@@ -389,34 +392,33 @@ export default function CriarTreino({ navigation }) {
         }
 
     })
-    
+
     const salvarPressed = (() => {
-        if(exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0){
-        alert("Adicione ao menos um exercício antes de salvar a ficha")
-    } else {
-        let objetoAux = {
-            Nome: nomeFicha,
-            Segunda: exerciciosAdicionados[0],
-            Terca: exerciciosAdicionados[1],
-            Quarta: exerciciosAdicionados[2],
-            Quinta: exerciciosAdicionados[3],
-            Sexta: exerciciosAdicionados[4]
+        if (exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0) {
+            Alert.alert("Erro", "Adicione ao menos um exercício antes de salvar a ficha")
+        } else {
+            let objetoAux = {
+                Nome: nomeFicha,
+                Segunda: exerciciosAdicionados[0],
+                Terca: exerciciosAdicionados[1],
+                Quarta: exerciciosAdicionados[2],
+                Quinta: exerciciosAdicionados[3],
+                Sexta: exerciciosAdicionados[4],
+                Modified: new Date().toLocaleString()
+            }
+            const res = bd.collection('Fichas').doc(nomeFicha).set(objetoAux);
+            Alert.alert("Sucesso", "Ficha salva com sucesso");
+            navigation.goBack();
         }
-        const res = bd.collection('Fichas').doc(nomeFicha).set(objetoAux);
-        alert("FICHA SALVA COM SUCESSO");
-        navigation.goBack();
-        
-    }
     })
     return (
-        <View style={styles.view}>
+        <KeyboardAvoidingView style={styles.view}>
             <Text style={styles.label}>Nome da Ficha</Text>
             <TextInput
                 placeholder=""
                 onChangeText={text => setNomeFicha(text)}
                 style={styles.input}
                 editable={editarNome}
-
             />
             <View style={{ width: "80%" }}>
                 <Text style={styles.label}>Selecione o dia</Text>
@@ -452,40 +454,37 @@ export default function CriarTreino({ navigation }) {
 
             </View>
             <Text style={styles.label}>Descrição do Treino (Séries, Repetições)</Text>
-
             <TextInput
-                placeholder=""
                 onChangeText={text => setDescricao(text)}
-                style={styles.input}
+                style={[styles.input, styles.biggerInput]}
             />
             <View style={styles.viewBotoes}>
-                <TouchableOpacity style={styles.saveButton} onPress={AdicionarExercicioPressed}>
-                    <Text style={styles.saveButtonText}>
-                        ADICIONAR EXERCICIO
+                <TouchableOpacity style={styles.button} onPress={AdicionarExercicioPressed}>
+                    <Text style={styles.buttonText}>
+                        ADICIONAR EXERCÍCIO
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.saveButton} onPress={EditarExercicioPressed}>
-                    <Text style={styles.saveButtonText}>
+                <TouchableOpacity style={styles.button} onPress={EditarExercicioPressed}>
+                    <Text style={styles.buttonText}>
                         EDITAR EXERCÍCIOS ADICIONADOS
                     </Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.viewBotoes}>
-                <TouchableOpacity style={styles.saveButton} onPress={() => {salvarPressed()}}>
-                    <Text style={styles.saveButtonText}>
+                <TouchableOpacity style={styles.button} onPress={() => { salvarPressed() }}>
+                    <Text style={styles.buttonText}>
                         SALVAR
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.saveButton} onPress={() => { navigation.goBack() }}>
-                    <Text style={styles.saveButtonText}>
+                <TouchableOpacity style={styles.button} onPress={() => { navigation.goBack() }}>
+                    <Text style={styles.buttonText}>
                         CANCELAR
                     </Text>
                 </TouchableOpacity>
             </View>
-
             {modalEdtExercicio()}
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 const styles = StyleSheet.create({
@@ -494,12 +493,11 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
         backgroundColor: "black",
         alignItems: 'center',
-        justifyContent: 'center'
     },
     input: {
         backgroundColor: "white",
-        paddingHorizontal: 15,
-        paddingVertical: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         borderRadius: 10,
         marginBottom: 15,
         textAlign: 'center',
@@ -507,8 +505,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
 
     },
-    saveButton: {
-        backgroundColor: "yellow",
+    biggerInput: {
+        height: 60
+
+    },
+    button: {
+        backgroundColor: "#F7C724",
         padding: 10,
         borderRadius: 10,
         alignItems: 'center',
@@ -520,10 +522,10 @@ const styles = StyleSheet.create({
     dropdown: {
         marginBottom: 15,
         alignSelf: 'center',
-        zIndex: 9
+        zIndex: 9,
 
     },
-    saveButtonText: {
+    buttonText: {
         textAlign: 'center',
         fontWeight: '500',
         fontSize: 13,
@@ -561,7 +563,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '90%',
         alignSelf: 'center',
-        borderRadius: 20, 
+        borderRadius: 20,
         padding: 15
 
     },
@@ -572,7 +574,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginBottom: 10
     },
-    modal:{
+    modal: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',

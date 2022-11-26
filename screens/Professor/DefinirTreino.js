@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Modal, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Modal, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { firestore as bd } from '../../firebase'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DialogWithList from "../../Components/DialogWithList";
@@ -55,7 +55,7 @@ export default function DefinirTreino({ navigation }) {
                 setAlunos(usuarios_adquiridos);
                 setFilteredAlunos(usuarios_adquiridos);
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro",error.code, error.message)
             })
     }
     const getFichas = async () => {
@@ -72,7 +72,7 @@ export default function DefinirTreino({ navigation }) {
                 })
                 setFichas(fichas_adquiridas);
             }).catch(error => {
-                alert(error.code, error.message)
+                Alert.alert("Erro", error.code, error.message)
             })
     }
     const searchFilterFunction = (text) => {
@@ -159,7 +159,6 @@ export default function DefinirTreino({ navigation }) {
                 value={somenteSemFicha}
             />
             </View>
-
 
             {filteredAlunos.map((item, index) => {
                 return (

@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "VIP_2",
-    "slug": "VIP_2",
+    "name": "VIP Academia",
+    "slug": "vip-academia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "contain", 
       "backgroundColor": "#000000"
     },
     "updates": {
@@ -21,6 +21,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.isdevelopment.vip",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
