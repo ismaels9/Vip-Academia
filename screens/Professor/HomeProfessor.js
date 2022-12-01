@@ -9,7 +9,7 @@ export default function HomeProfessor({ route, navigation }) {
         firebaseAuth
             .signOut()
             .then(() => {
-                navigation.replace("LogIn")
+                navigation.replace("Login")
                 AsyncStorage.removeItem('@loggedUserCache');
             })
             .catch(error => Alert.alert("Erro", error.message))

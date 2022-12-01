@@ -3,7 +3,6 @@ import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/database";
 import "firebase/compat/storage";
-//import * as firebase from "firebase"
 
 const firebaseConfig = {
     apiKey: "AIzaSyCDQSUfbi54QJhdFSAJwB8lThfVvWBBtBo",
@@ -14,14 +13,7 @@ const firebaseConfig = {
     messagingSenderId: "292663336079",
     appId: "1:292663336079:web:4de382da55cbf05933a4fa"
   };
-  /*let app;
-  if(firebase.apps.length === 0){
-    app = firebase.initializeApp(firebaseConfig)
-  } else {
-    app = firebase.app()
-  }
-  const auth = firebase.auth();
-  export {auth};*/
+
   firebase.initializeApp(firebaseConfig);
 
   export const firebaseAuth = firebase.auth();

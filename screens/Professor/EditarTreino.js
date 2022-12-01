@@ -82,13 +82,13 @@ export default function EditarTreino({ navigation }) {
                 {
                     text: "Ver",
                     onPress: (() => {
-                        navigation.replace("TelaVerTreino", ficha_clicada)
+                        navigation.replace("VerTreino", ficha_clicada)
                     }),
                 },
                 {
                     text: "Editar",
                     onPress: (() => {
-                        navigation.replace("TelaEditarTreino", ficha_clicada)
+                        navigation.replace("EditarFichaJaCriada", ficha_clicada)
                     }),
                 },
             ]

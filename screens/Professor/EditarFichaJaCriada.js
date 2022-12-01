@@ -4,7 +4,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { firestore as bd } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function TelaEditarTreino({ route, navigation }) {
+export default function EditarFichaJaCriada({ route, navigation }) {
     const fichaEditada = route.params
     const [nomeFicha, setNomeFicha] = useState(fichaEditada.Nome)
     const [dias, setDias] = useState([{ label: "Segunda", value: "Segunda" }, { label: "Terça", value: "Terca" }, { label: "Quarta", value: "Quarta" }, { label: "Quinta", value: "Quinta" }, { label: "Sexta", value: "Sexta" }])
@@ -268,6 +268,8 @@ export default function TelaEditarTreino({ route, navigation }) {
                                         flexDirection: 'row',
                                         marginTop: 10,
                                         marginLeft: 10,
+                                        maxWidth: '82%'
+
                                     }}>
 
                                         <View>
@@ -402,7 +404,9 @@ export default function TelaEditarTreino({ route, navigation }) {
                 Terca: exerciciosAdicionados[1],
                 Quarta: exerciciosAdicionados[2],
                 Quinta: exerciciosAdicionados[3],
-                Sexta: exerciciosAdicionados[4]
+                Sexta: exerciciosAdicionados[4],
+                Modified: new Date().toLocaleDateString()
+
             }
             const res = bd.collection('Fichas').doc(nomeFicha).set(objetoAux);
             Alert.alert("Sucesso", "Ficha salva com sucesso");

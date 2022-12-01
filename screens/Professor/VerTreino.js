@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function TelaVerTreino({route, navigation}) {
+export default function VerTreino({route, navigation}) {
     const fichaEditada = route.params
     console.log(fichaEditada)
 
@@ -32,7 +32,7 @@ export default function TelaVerTreino({route, navigation}) {
             <View>
             {array.map((item, index) => {
                 return (
-                    <View key={index} style={{width: '100%'}}>
+                    <View key={index} style={{width: '85%'}}>
                         <View style={styles.itemContainer} onPress={() => {}}>
                             <Ionicons name="barbell-outline" size={35} color="white" style={{paddingRight:10}}/>
                             <View style={{flexDirection:'column'}}>

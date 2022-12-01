@@ -265,6 +265,7 @@ export default function CriarTreino({ navigation }) {
                                         flexDirection: 'row',
                                         marginTop: 10,
                                         marginLeft: 10,
+                                        maxWidth: '82%'
                                     }}>
 
                                         <View>

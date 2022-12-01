@@ -4,8 +4,10 @@ import { firebaseAuth, firestore as bd } from '../firebase';
 import Loading from '../Components/Loading'
 import { tradutor } from '../tradutor'
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MaskInput from "react-native-mask-input";
 
-export default function LogInScreen({ navigation }) {
+
+export default function Login({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [openModal, setOpenModal] = useState(false);
@@ -16,7 +18,7 @@ export default function LogInScreen({ navigation }) {
 
     useEffect(() => {
         getData();
-        if (Object.keys(loggedUser).length > 0) {          
+        if (Object.keys(loggedUser).length > 0) {
             if (loggedUser.Tipo == 'Aluno') {
                 navigation.replace("HomeAluno", loggedUser)
             } else if (loggedUser.Tipo == 'Professor') {
@@ -28,7 +30,7 @@ export default function LogInScreen({ navigation }) {
     const getData = async () => {
         try {
             const jsonValue = await AsyncStorage.getItem('@loggedUserCache')
-            setLoggedUser (jsonValue != null ? JSON.parse(jsonValue) : {});
+            setLoggedUser(jsonValue != null ? JSON.parse(jsonValue) : {});
         } catch (e) {
             Alert.alert("Erro", e.message)
         }
@@ -75,7 +77,8 @@ export default function LogInScreen({ navigation }) {
                         Nome: doc.data().Nome,
                         Tipo: doc.data().Tipo,
                         Email: doc.data().Email,
-                        ID_Treino: doc.data().ID_Treino
+                        ID_Treino: doc.data().ID_Treino,
+                        Telefone: doc.data().Telefone
                     }
                 })
                 setLoggedUser(usuario_adquirido);
@@ -116,19 +119,24 @@ export default function LogInScreen({ navigation }) {
                 handleLogIn()
             })
             .catch(error => {
-                Alert.alert("Erro",tradutor(error.code, error.message))
+                Alert.alert("Erro", tradutor(error.code, error.message))
                 setLoadingVisible(false)
             })
     }
     const handleLogIn = () => {
+        console.log('aqui')
         firebaseAuth
             .signInWithEmailAndPassword(email, password)
             .then(userCredentials => {
+                console.log('aqui2')
+
                 getUser();
                 const user = userCredentials.user;
             })
             .catch(error => {
-                Alert.alert("Erro",tradutor(error.code, error.message))
+                console.log('aqui3')
+
+                Alert.alert("Erro", tradutor(error.code, error.message))
                 setLoadingVisible(false);
             })
     }
@@ -136,13 +144,13 @@ export default function LogInScreen({ navigation }) {
         setLoadingVisible(true);
         firebaseAuth.sendPasswordResetEmail(email)
             .then(() => {
-                Alert.alert("Redefinição de Senha","Verifique sua caixa de e-mail")
+                Alert.alert("Redefinição de Senha", "Verifique sua caixa de e-mail")
                 setLoadingVisible(false);
 
             })
             .catch((error) => {
                 setLoadingVisible(false)
-                Alert.alert("Erro",tradutor(error.code, error.message))
+                Alert.alert("Erro", tradutor(error.code, error.message))
 
             });
     }
@@ -151,10 +159,10 @@ export default function LogInScreen({ navigation }) {
         <KeyboardAvoidingView
             style={styles.container}
             behavior="padding"
-            >
+        >
             <Loading visible={loadingVisible} />
 
-            <Image 
+            <Image
                 source={require('../assets/logo.jpg')}
                 style={styles.logo} />
             <View style={styles.inputContainer}>
@@ -201,17 +209,24 @@ export default function LogInScreen({ navigation }) {
                         value={name}
                         onChangeText={text => setName(text)}
                         style={styles.input} />
-                    <TextInput
+                    <MaskInput
+                        style={styles.input}
                         placeholder="Telefone"
                         value={phone}
-                        keyboardType="numeric"
-                        onChangeText={text => setPhone(text)}
-                        style={styles.input} />
+                        onChangeText={(masked, unmasked) => {
+                            setPhone(unmasked);
+                        }}
+                        keyboardType='numeric'
+                        mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                    />
                     <TextInput
                         placeholder="Email"
                         value={email}
                         onChangeText={text => setEmail(text)}
-                        style={styles.input} />
+                        style={styles.input}
+                        autoCapitalize='none'
+
+                    />
                     <TextInput
                         placeholder="Senha"
                         value={password}
@@ -311,7 +326,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontWeight: '700',
     },
-    logo:{
+    logo: {
         width: '50%',
         resizeMode: 'contain'
 

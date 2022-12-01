@@ -7,11 +7,9 @@ import CheckBox from 'expo-checkbox';
 
 export default function Hoje({ route, navigation }) {
     const [progress, setProgress] = useState('0');
-    const [ficha, setFicha] = useState([]);
-    const id_ficha = route.params.ficha;
+    const [ficha, setFicha] = useState(route.params.ficha);
     const [treinoDia, setTreinoDia] = useState([])
-    //const dia = new Date().getDay()
-    const dia = 2
+    const dia = new Date().getDay()
     const [checkItem, setCheckItem] = useState([]);
     var totalChecked = 0;
 
@@ -34,53 +32,36 @@ export default function Hoje({ route, navigation }) {
     };
 
     useEffect(() => {
-        bd.collection('Fichas').doc(id_ficha)
-            .get()
-            .then((querySnapshot) => {
-                var ficha_adquirida = {
-                    id: querySnapshot.id,
-                    Nome: querySnapshot.data().Nome,
-                    Segunda: querySnapshot.data().Segunda,
-                    Terca: querySnapshot.data().Terca,
-                    Quarta: querySnapshot.data().Quarta,
-                    Quinta: querySnapshot.data().Quinta,
-                    Sexta: querySnapshot.data().Sexta,
-                    Modified: querySnapshot.data().Modified
-                }
-                setFicha(ficha_adquirida);
-                getExerciciosDia(ficha_adquirida)
-            }).catch(e =>{
-            })
-    }, [])
-    const getExerciciosDia = ((ficha_recebida) => {
+        console.log(typeof ficha.ad)
+        if(ficha != 'Sem Ficha'){
         let arrayAux = [];
         switch (dia) {
             case 0:
                 setTreinoDia({})
                 break;
             case 1:
-                setTreinoDia(ficha_recebida.Segunda)
-                arrayAux = Array(Object.keys(ficha_recebida.Segunda).length).fill(false);
+                setTreinoDia(ficha.Segunda)
+                arrayAux = Array(Object.keys(ficha.Segunda).length).fill(false);
                 setCheckItem(arrayAux)
                 break;
             case 2:
-                setTreinoDia(ficha_recebida.Terca)
-                arrayAux = Array(Object.keys(ficha_recebida.Terca).length).fill(false);
+                setTreinoDia(ficha.Terca)
+                arrayAux = Array(Object.keys(ficha.Terca).length).fill(false);
                 setCheckItem(arrayAux)
                 break;
             case 3:
-                setTreinoDia(ficha_recebida.Quarta)
-                arrayAux = Array(Object.keys(ficha_recebida.Quarta).length).fill(false);
+                setTreinoDia(ficha.Quarta)
+                arrayAux = Array(Object.keys(ficha.Quarta).length).fill(false);
                 setCheckItem(arrayAux)
                 break;
             case 4:
-                setTreinoDia(ficha_recebida.Quinta)
-                arrayAux = Array(Object.keys(ficha_recebida.Quinta).length).fill(false);
+                setTreinoDia(ficha.Quinta)
+                arrayAux = Array(Object.keys(ficha.Quinta).length).fill(false);
                 setCheckItem(arrayAux)
                 break;
             case 5:
-                setTreinoDia(ficha_recebida.Sexta)
-                arrayAux = Array(Object.keys(ficha_recebida.Sexta).length).fill(false);
+                setTreinoDia(ficha.Sexta)
+                arrayAux = Array(Object.keys(ficha.Sexta).length).fill(false);
                 setCheckItem(arrayAux)
                 break;
             case 6:
@@ -89,10 +70,8 @@ export default function Hoje({ route, navigation }) {
             default:
                 setTreinoDia({})
                 break;
-        }
-    })
-
-
+        }}
+    }, [])
     const renderizaLista = (() => {
         if (treinoDia.length>0) {
             return (
@@ -125,7 +104,7 @@ export default function Hoje({ route, navigation }) {
 
                 </ScrollView>
             )
-        }else if(treinoDia.length == 0 && ficha.length==0){
+        }else if(ficha == "Sem Ficha"){
             return(
                 <View style={styles.viewError}>
                     <Image source={require('../../assets/botao-x.png')} style={styles.iconeErro} />
