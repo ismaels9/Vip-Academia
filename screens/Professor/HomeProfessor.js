@@ -14,14 +14,14 @@ export default function HomeProfessor({ route, navigation }) {
             })
             .catch(error => Alert.alert("Erro", error.message))
     }
-    const usuarioLogado = route.params
+    const loggedUser = route.params
     return (
         <View style={styles.container}>
             <Image
                 resizeMethod='scale'
                 style={styles.logo}
                 source={require('../../assets/logo.jpg')} />
-            <Text style={styles.titulo}> Bem-Vindo, {usuarioLogado.Nome}</Text>
+            <Text style={styles.titulo}> Bem-Vindo, {loggedUser.Name}</Text>
             <View style={styles.containerView}>
                 <TouchableOpacity style={[styles.opcao, styles.primaryColor]} onPress={() => navigation.navigate("DefinirTreino")}>
                     <Ionicons name="document-text-outline" size={50} coclor="black" />

@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { View, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { firestore as bd } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getWorkoutLogs } from "../../Components/Functions";
 
 export default function EditarTreino({ navigation }) {
-    const [fichas, setFichas] = useState([])
-    const [filteredFichas, setFilteredFichas] = useState([]);
+    const [workoutLogs, setWorkoutLogs] = useState([])
+    const [filteredWorkoutLogs, setFilteredWorkoutLogs] = useState([]);
 
 
     useEffect(() => {
-        getFichas()
+        getData()
+        if(workoutLogs == 'No matching documents.'){
+            Alert.alert("Sem ficha cadastradas", "Não existem fichas cadastradas")
+            navigation.goBack()
+        }
     }, [])
+
+    const getData = (async () => {
+        let aux = await getWorkoutLogs('all')
+        setWorkoutLogs(aux) 
+        setFilteredWorkoutLogs(aux)
+    })
 
     useEffect(() => {
         navigation.setOptions({
@@ -28,52 +39,19 @@ export default function EditarTreino({ navigation }) {
     })
     const searchFilterFunction = (text) => {
         if (text) {
-            const newData = fichas.filter(item => {
-                const itemData = item.Nome ? item.Nome.toUpperCase() : ''.toUpperCase();
+            const newData = workoutLogs.filter(item => {
+                const itemData = item.Name ? item.Name.toUpperCase() : ''.toUpperCase();
                 const textData = text.toUpperCase();
                 return itemData.indexOf(textData) > -1;
             })
-            setFilteredFichas(newData);
+            setFilteredWorkoutLogs(newData);
 
         } else {
-            setFilteredFichas(fichas);
+            setFilteredWorkoutLogs(workoutLogs);
         }
     }
 
-    const getFichas = async () => {
-        await bd.collection('Fichas')
-            .get()
-            .then((querySnapshot) => {
-                let fichas_adquiridas = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida = {
-                        id: doc.id,
-                        Nome: doc.data().Nome,
-                        Segunda: doc.data().Segunda,
-                        Terca: doc.data().Terca,
-                        Quarta: doc.data().Quarta,
-                        Quinta: doc.data().Quinta,
-                        Sexta: doc.data().Sexta,
-                    }
-                    fichas_adquiridas.push(ficha_adquirida);
-                })
-                if (fichas_adquiridas.length > 0) {
-                    setFichas(fichas_adquiridas);
-                    setFilteredFichas(fichas_adquiridas);
-
-                }
-                else {
-                    Alert.alert("Sem ficha cadastradas", "Não existem fichas cadastradas")
-                    navigation.goBack();
-
-                }
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-    }
-
-    const apertouFicha = ((ficha_clicada) => {
-        console.log(ficha_clicada)
+    const workoutLogPressed = ((workoutLogPressed) => {
         Alert.alert(
             "Selecione uma opção",
             "Você deseja ver ou editar a ficha?",
@@ -82,13 +60,13 @@ export default function EditarTreino({ navigation }) {
                 {
                     text: "Ver",
                     onPress: (() => {
-                        navigation.replace("VerTreino", ficha_clicada)
+                        navigation.replace("VerTreino", workoutLogPressed)
                     }),
                 },
                 {
                     text: "Editar",
                     onPress: (() => {
-                        navigation.replace("EditarFichaJaCriada", ficha_clicada)
+                        navigation.replace("EditarFichaJaCriada", workoutLogPressed)
                     }),
                 },
             ]
@@ -96,7 +74,7 @@ export default function EditarTreino({ navigation }) {
 
     })
 
-    const apertouExcluir = ((ficha_clicada) => {
+    const deletePressed = ((workoutLogPressed) => {
         Alert.alert(
             "Exclusão de ficha", "Tem certeza que deseja excluir a ficha?",
             [
@@ -105,18 +83,17 @@ export default function EditarTreino({ navigation }) {
                     text: "SIM",
                     onPress: (() => {
                         try{ 
-                            const res = bd.collection('Fichas').doc(ficha_clicada.id).delete();       
-                            bd.collection('Usuários').where("ID_Treino", "==", ficha_clicada.id)
+                            const res = bd.collection('WorkoutLogs').doc(workoutLogPressed.id).delete();       
+                            bd.collection('Users').where("WorkoutLog", "==", workoutLogPressed.id)
                         .get()
                         .then((querySnapshot) => {
                             querySnapshot.forEach((doc) => {
-                                doc.ref.update({ID_Treino: ""});
+                                doc.ref.update({WorkoutLog: ""});
                             }
                             )
                         })
                             Alert.alert("Sucesso","Ficha excluída com sucesso");
                             navigation.goBack();
-
                         }catch(e){
                             Alert.alert("Erro" ,e.message)
                         }
@@ -133,19 +110,17 @@ export default function EditarTreino({ navigation }) {
                 Fichas
             </Text>
             {
-                filteredFichas.map((item, index) => {
+                filteredWorkoutLogs.map((item, index) => {
                     return (
                         <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                            <TouchableOpacity style={styles.itemContainer} onPress={() => apertouFicha(item)}>
+                            <TouchableOpacity style={styles.itemContainer} onPress={() => workoutLogPressed(item)}>
                                 <Ionicons name="document-text-outline" size={35} color="white" />
-                                <Text style={styles.textName}>{item.Nome}</Text>
+                                <Text style={styles.textName}>{item.Name}</Text>
                             </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => apertouExcluir(item)}>
+                            <TouchableOpacity onPress={() => deletePressed(item)}>
                                 <Ionicons name="close-circle-outline" size={30} color="red" style={{ alignSelf: 'flex-end' }} />
                             </TouchableOpacity>
                         </View>
-
                     )
                 })}
         </ScrollView>

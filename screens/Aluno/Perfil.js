@@ -3,13 +3,13 @@ import { View, StyleSheet, Text, Image, TouchableOpacity, SafeAreaView, Alert, T
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaskInput from "react-native-mask-input";
 import Loading from "../../Components/Loading";
-import { firebaseAuth } from "../../firebase";
+import { firebaseAuth, firestore as bd } from "../../firebase";
 
 
-export default function Hoje({ route, navigation }) {
-    const [usuario, setUsuario] = useState(route.params.usuario);
-    const [name, setName] = useState(usuario.Nome);
-    const [telephone, setTelephone] = useState(usuario.Telefone);
+export default function Hoje({ route }) {
+    const [user, setUser] = useState(route.params.user);
+    const [name, setName] = useState(user.Name);
+    const [telephone, setTelephone] = useState(user.Telephone);
     const [phoneEditable, setPhoneEditable] = useState(false)
     const [nameEditable, setNameEditable] = useState(false)
     const [loadingVisible, setLoadingVisible] = useState(false)
@@ -31,7 +31,7 @@ export default function Hoje({ route, navigation }) {
 
     })
 
-    const renderizaBotaoPhone = (() => {
+    const phoneButtonRender = (() => {
         if (phoneEditable) {
             return (
                 <TouchableOpacity onPress={() => handleChangePhone()}>
@@ -49,21 +49,21 @@ export default function Hoje({ route, navigation }) {
 
     const handleChangeName = (() => {
         Keyboard.dismiss()
-        bd.collection('Usuários').doc(usuario.Email).update({ Nome: name })
+        bd.collection('Users').doc(user.Email).update({ Name: name })
         Alert.alert("Sucesso", "Nome alterado com sucesso")
         setNameEditable(false)
     })
 
     const handleChangePhone = (() => {
         Keyboard.dismiss()
-        bd.collection('Usuários').doc(usuario.Email).update({ Telefone: telephone })
+        bd.collection('Users').doc(user.Email).update({ Telephone: telephone })
         Alert.alert("Sucesso", "Nome alterado com Sucesso")
         setPhoneEditable(false)
     })
 
     const handleChangePassword = (() => {
         setLoadingVisible(true);
-        firebaseAuth.sendPasswordResetEmail(usuario.Email)
+        firebaseAuth.sendPasswordResetEmail(user.Email)
             .then(() => {
                 Alert.alert("Redefinição de Senha","Verifique sua caixa de e-mail")
                 setLoadingVisible(false);
@@ -74,13 +74,8 @@ export default function Hoje({ route, navigation }) {
                 Alert.alert("Erro",tradutor(error.code, error.message))
 
             });
-
     })
 
-    const handleSendComment = (() => {
-        
-
-    })
 
     return (
         <SafeAreaView style={styles.view}>
@@ -112,17 +107,13 @@ export default function Hoje({ route, navigation }) {
                             keyboardType='numeric'
                             mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                         />
-                        {renderizaBotaoPhone()}
+                        {phoneButtonRender()}
                     </View>
                 </View>
                 <View style={styles.viewOptions}>
                     <View style={styles.viewUserData}>
                         <Ionicons name="key-outline" size={30} color="#F7C724" style={styles.icone} />
                         <TouchableOpacity onPress={handleChangePassword}><Text style={styles.textUserData}>ALTERAR SENHA</Text></TouchableOpacity>
-                    </View>
-                    <View style={styles.viewUserData}>
-                        <Ionicons name="chatbubble-ellipses-outline" size={30} color="#F7C724" style={styles.icone} />
-                        <TouchableOpacity onPress={handleSendComment}><Text style={styles.textUserData}>ENVIE SUA SUGESTÃO</Text></TouchableOpacity>
                     </View>
                 </View>
                 <Text style={styles.textFooter}>Powered by VIP ACADEMIA</Text>

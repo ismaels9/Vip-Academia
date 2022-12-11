@@ -1,29 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert, KeyboardAvoidingView } from 'react-native';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Modal, Alert, KeyboardAvoidingView, DatePickerIOSBase } from 'react-native';
 import DropDownPicker from "react-native-dropdown-picker";
 import { firestore as bd } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import GlobalVariables from "../../Components/GlobalVariables";
+import { getExercisesList } from "../../Components/Functions";
 
 export default function CriarTreino({ navigation }) {
-    const [nomeFicha, setNomeFicha] = useState('')
-    const [dias, setDias] = useState([{ label: "Segunda", value: "Segunda" }, { label: "Terça", value: "Terca" }, { label: "Quarta", value: "Quarta" }, { label: "Quinta", value: "Quinta" }, { label: "Sexta", value: "Sexta" }])
-    const [grupoMuscular, setGrupoMuscular] = useState([{ label: "Bíceps", value: "Biceps" }, { label: "Costas", value: "Costas" }, { label: "Ombro", value: "Ombro" }, { label: "Peito", value: "Peito" }, { label: "Perna", value: "Perna" }, { label: "Tríceps", value: "Triceps" }])
-    const [exercicios, setExercicios] = useState([]);
-    const [descricao, setDescricao] = useState('');
-    const [openDias, setOpenDias] = useState(false);
-    const [valueDias, setValueDias] = useState('');
-    const [openGM, setOpenGM] = useState(false);
-    const [valueGM, setValueGM] = useState('');
-    const [openEx, setOpenEx] = useState(false);
-    const [valueEx, setValueEx] = useState('');
-    const [exerciciosLista, setExerciciosLista] = useState([]);
-    const [exerciciosAdicionados, setExerciciosAdicionados] = useState([[], [], [], [], []]);
-    const [editarNome, setEditarNome] = useState(true);
-    const [visibleModal, setVisibleModal] = useState(false);
-    const [valueModal, setValueModal] = useState('');
-    const [openModal, setOpenModal] = useState(false);
-    const [listaModal, setListaModal] = useState([])
-    var listaCompleta = [];
+    
+    const [workoutLogName, setWorkoutLogName] = useState('')
+    const [exercises, setExercises] = useState([]);
+    const [description, setDescription] = useState('');
+    const [openDaysDropdown, setOpenDaysDropdown] = useState(false); 
+    const [valueDaysDropdown, setValueDaysDropdown] = useState('');
+    const [openMuscleGroupDropdown, setopenMuscleGroupDropdown] = useState(false);
+    const [valueMuscleGroupDropdown, setValueMuscleGroupDropdown] = useState('');
+    const [openExercisesDrown, setOpenExercisesDropdown] = useState(false);
+    const [valueExercisesDropdown, setValueExercisesDropdown] = useState('');
+    const [exercisesList, setExercisesList] = useState([]);
+    const [addedExercises, setAddedExercises] = useState();
+    const [isNameEditable, setIsNameEditable] = useState(true);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [valueDaysModalDropdown, setValueDaysModalDropdown] = useState('');
+    const [openDaysModalDropdown, setOpenDaysModalDropdown] = useState(false);
+    const [modalExercisesList, setModalExercisesList] = useState([]);
 
     useEffect(() => {
         navigation.setOptions({
@@ -35,249 +35,101 @@ export default function CriarTreino({ navigation }) {
             , []
     })
     useEffect(() => {
-        getListaExerciciosBiceps()
-        getListaExerciciosCostas()
-        getListaExerciciosOmbro()
-        getListaExerciciosPeito()
-        getListaExerciciosPerna()
-        getListaExerciciosTriceps()
-        setExerciciosLista(listaCompleta)
+        getAllExercises()
+        let aux = [];
+        GlobalVariables.weekDays.forEach((item) => {
+            aux.push({day: item.value, exercises: []})
+        })
+        setAddedExercises(aux)
 
     }, [])
 
-    const getListaExerciciosBiceps = async () => {
-        await bd.collection('Biceps')
-            .get()
-            .then((querySnapshot) => {
-                let Biceps = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida_biceps = {
-                        label: doc.id,
-                        value: doc.data().Nome,
-                    }
-                    Biceps.push(ficha_adquirida_biceps);
-                })
-                listaCompleta.push(Biceps)
-
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-    }
-    const getListaExerciciosCostas = async () => {
-        await bd.collection('Costas')
-            .get()
-            .then((querySnapshot) => {
-                let Costas = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida_costas = {
-                        label: doc.id,
-                        value: doc.data().Nome,
-                    }
-                    Costas.push(ficha_adquirida_costas);
-
-                })
-                listaCompleta.push(Costas)
-
-
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-    }
-    const getListaExerciciosPerna = async () => {
-
-        await bd.collection('Perna')
-            .get()
-            .then((querySnapshot) => {
-                let Perna = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida_perna = {
-                        label: doc.id,
-                        value: doc.data().Nome,
-                    }
-                    Perna.push(ficha_adquirida_perna);
-
-
-                })
-                listaCompleta.push(Perna)
-
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-    }
-    const getListaExerciciosPeito = async () => {
-
-        await bd.collection('Peito')
-            .get()
-            .then((querySnapshot) => {
-                let Peito = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida_peito = {
-                        label: doc.id,
-                        value: doc.data().Nome,
-                    }
-                    Peito.push(ficha_adquirida_peito);
-                })
-                listaCompleta.push(Peito)
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-    }
-    const getListaExerciciosOmbro = async () => {
-        await bd.collection('Ombro')
-            .get()
-            .then((querySnapshot) => {
-                let Ombro = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida_ombro = {
-                        label: doc.id,
-                        value: doc.data().Nome,
-                    }
-                    Ombro.push(ficha_adquirida_ombro);
-                })
-                listaCompleta.push(Ombro)
-
-
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-    }
-
-    const getListaExerciciosTriceps = async () => {
-        await bd.collection('Triceps')
-            .get()
-            .then((querySnapshot) => {
-                let Triceps = [];
-                querySnapshot.forEach((doc) => {
-                    let ficha_adquirida_triceps = {
-                        label: doc.id,
-                        value: doc.data().Nome,
-                    }
-                    Triceps.push(ficha_adquirida_triceps);
-                })
-                listaCompleta.push(Triceps)
-            }).catch(error => {
-                Alert.alert("Erro", error.code, error.message)
-            })
-
-    }
-
-    const grupoMuscularSelecionado = (grupoMuscularSelecionado) => {
-        if (exerciciosLista.length == 6) {
-            switch (grupoMuscularSelecionado) {
-                case "Biceps":
-                    setExercicios(exerciciosLista[0])
-                    break;
-                case "Costas":
-                    setExercicios(exerciciosLista[1])
-                    break;
-                case "Ombro":
-                    setExercicios(exerciciosLista[2])
-                    break;
-                case "Peito":
-                    setExercicios(exerciciosLista[3])
-                    break;
-                case "Perna":
-                    setExercicios(exerciciosLista[4])
-                    break;
-                case "Triceps":
-                    setExercicios(exerciciosLista[5])
-                    break;
-                default:
-                    setExercicios([])
-            }
+    const getAllExercises = ( async () => {
+        let listAux = []
+        for (const item in GlobalVariables.muscleGroups){
+            let aux = {name: GlobalVariables.muscleGroups[item].value, exercises: await getExercisesList(GlobalVariables.muscleGroups[item].value)}
+            listAux.push(aux)
         }
+        console.log(listAux)
+        setExercisesList(listAux)
+    })
+
+    const selectedMuscleGroup = (selectedMuscleGroup) => {
+        exercisesList.map((item) => {
+            if (item.name == selectedMuscleGroup) {
+                setExercises(item.exercises)
+            }
+        })
     }
 
-    const exerciciosDropdown = (() => {
-        if (valueGM != "" && exercicios.length > 0) {
+    const exercisesDropdown = (() => {
+        if (valueMuscleGroupDropdown != "" && exercises.length > 0) {
             return (
                 <View>
                     <Text style={styles.label}>Selecione o Exercício</Text>
                     <DropDownPicker style={styles.dropdown}
                         placeholder=""
-                        open={openEx}
-                        value={valueEx}
-                        items={exercicios}
-                        setOpen={setOpenEx}
-                        setValue={setValueEx}
-                        setItems={setExercicios}
+                        open={openExercisesDrown}
+                        value={valueExercisesDropdown}
+                        items={exercises}
+                        setOpen={setOpenExercisesDropdown}
+                        setValue={setValueExercisesDropdown}
+                        setItems={setExercises}
                         theme="LIGHT"
-                        onOpen={() => { setOpenGM(false); setOpenDias(false) }}
+                        onOpen={() => { setopenMuscleGroupDropdown(false); setOpenDaysDropdown
+                    (false) }}
                         scrollViewProps={{ nestedScrollEnabled: true }}
                     />
                 </View>
             )
         }
-
-    })
-    const redefiniLista = (() => {
-        switch (valueModal) {
-            case 'Segunda':
-                setListaModal(exerciciosAdicionados[0])
-                break;
-            case 'Terca':
-                setListaModal(exerciciosAdicionados[1])
-                break;
-            case 'Quarta':
-                setListaModal(exerciciosAdicionados[2])
-                break;
-            case 'Quinta':
-                setListaModal(exerciciosAdicionados[3])
-                break;
-            case 'Sexta':
-                setListaModal(exerciciosAdicionados[4])
-                break;
-        }
     })
 
-    const modalEdtExercicio = (() => {
-        redefiniLista
+    const resetList = (() => {
+        addedExercises.map((item) => {
+            if (valueDaysModalDropdown == item.day) {
+                setModalExercisesList(item.exercises)
+            }
+        })
+    })
 
+    const modalEditExercises = (() => {
         return (
-            <Modal transparent visible={visibleModal}>
+            <Modal transparent visible={isModalVisible}>
                 <View style={styles.modal}>
                     <View style={styles.viewModal}>
-
-                        <TouchableOpacity onPress={() => setVisibleModal(false)}>
+                        <TouchableOpacity onPress={() => setIsModalVisible(false)}>
                             <Ionicons name="close-outline" size={27} color='white' style={{ alignSelf: 'flex-end' }} />
                         </TouchableOpacity>
                         <Text style={{ fontWeight: 'bold', fontSize: 18, alignSelf: 'center', color: 'white', marginBottom: 20 }}>Remover exercícios adicionados</Text>
-
                         <Text style={{ fontWeight: 'bold', fontSize: 16, alignSelf: 'center', color: 'white', marginBottom: 5 }}>Selecione o dia</Text>
                         <DropDownPicker style={styles.dropdown}
                             placeholder=""
-                            open={openModal}
-                            value={valueModal}
-                            items={dias}
-                            setOpen={setOpenModal}
-                            setValue={setValueModal}
+                            open={openDaysModalDropdown}
+                            value={valueDaysModalDropdown}
+                            items={GlobalVariables.weekDays}
+                            setOpen={setOpenDaysModalDropdown}
+                            setValue={setValueDaysModalDropdown}
                             theme='LIGHT'
-                            onChangeValue={redefiniLista}
+                            onChangeValue={resetList}
                         />
                         <ScrollView style={styles.scroll}>
-                            <Text style={styles.textExercicio}>
-                                ExercÍcios cadastrados para {valueModal.toLowerCase()}
-                            </Text>
-                            {listaModal.map((item, index) => {
+                            {modalExercisesList.map((item, index) => {
                                 return (
-
                                     <View key={index} style={{
                                         flexDirection: 'row',
                                         marginTop: 10,
                                         marginLeft: 10,
                                         maxWidth: '82%'
                                     }}>
-
                                         <View>
-                                            <Text style={styles.textName}>{item.Exercicio}</Text>
-                                            <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                                            <Text style={styles.textName}>{item.Exercise}</Text>
+                                            <Text style={styles.textdescription}>{item.Description}</Text>
                                         </View>
-                                        <TouchableOpacity style={{ marginLeft: 15, alignItems: "flex-end" }} onPress={() => { removerItem(item) }}>
+                                        <TouchableOpacity style={{ marginLeft: 15, alignItems: "flex-end" }} onPress={() => { removeItem(item) }}>
                                             <Ionicons name="close-circle-outline" size={27} color='red' style={{ marginLeft: 0, }} />
                                         </TouchableOpacity>
-
                                     </View>
-
                                 )
                             })}
                         </ScrollView>
@@ -287,7 +139,7 @@ export default function CriarTreino({ navigation }) {
         )
     })
 
-    const removerItem = ((item) => {
+    const removeItem = ((item) => {
         Alert.alert(
             "Remoção de item",
             "Tem certeza que deseja remover o exercicio?",
@@ -298,116 +150,75 @@ export default function CriarTreino({ navigation }) {
                 },
                 {
                     text: "Sim", onPress: () => {
-                        let aux = listaModal;
+                        let aux = modalExercisesList;
                         aux.splice(aux.indexOf(item), 1);
-                        let aux1 = exerciciosAdicionados;
-                        switch (valueModal) {
-                            case 'Segunda':
-                                aux1[0] = aux;
-                                setExerciciosAdicionados(aux1);
-                                setListaModal([]);
-                                redefiniLista();
-                                break;
-                            case 'Terca':
-                                aux1[1] = aux;
-                                setExerciciosAdicionados(aux1);
-                                setListaModal([]);
-                                redefiniLista();
-                                break;
-                            case 'Quarta':
-                                aux1[2] = aux;
-                                setExerciciosAdicionados(aux1);
-                                setListaModal([]);
-                                redefiniLista();
-                                break;
-                            case 'Quinta':
-                                aux1[3] = aux;
-                                setExerciciosAdicionados(aux1);
-                                setListaModal([]);
-                                redefiniLista()
-                                break;
-                            case 'Sexta':
-                                aux1[4] = aux;
-                                setExerciciosAdicionados(aux1);
-                                setListaModal([]);
-                                redefiniLista();
-                                break;
-                        }
+                        let aux1 = addedExercises;
+                        aux1.map((item) => {
+                            if (valueDaysModalDropdown == item.day) {
+                                item.exercises = aux
+                            }
+                        })
+                        setAddedExercises(aux1);
+                        setModalExercisesList([]);
+                        resetList();
                     }
                 }
             ]
         );
-
     })
 
-    const AdicionarExercicioPressed = (() => {
-        if (nomeFicha == '') {
+    const addExercisePressed = (() => {
+        if (workoutLogName == '') {
             Alert.alert("Preencha todos os campos", "Preencha o campo Nome da Ficha")
-        } else if (valueDias == '') {
+        } else if (valueDaysDropdown == '') {
             Alert.alert("Preencha todos os campos", "Preencha o campo Dia")
-        } else if (valueGM == '') {
+        } else if (valueMuscleGroupDropdown == '') {
             Alert.alert("Preencha todos os campos", "Preencha o campo Grupo Muscular")
-        } else if (valueEx == '') {
+        } else if (valueExercisesDropdown == '') {
             Alert.alert("Preencha todos os campos", "Preencha o campo Exercício")
-        } else if (descricao == '') {
+        } else if (description == '') {
             Alert.alert("Preencha todos os campos", "Preencha o campo Descrição do Treino")
         } else {
-            let exerciciosAux = exerciciosAdicionados;
-            let exercicio = {
-                Exercicio: valueEx,
-                Descricao: descricao,
-                GrupoMuscular: valueGM
+            let auxExercises = addedExercises;
+            let exercise = {
+                Exercise: valueExercisesDropdown,
+                Description: description,
+                MuscleGroup: valueMuscleGroupDropdown
             }
-            switch (valueDias) {
-                case 'Segunda':
-                    exerciciosAux[0].push(exercicio);
-                    break;
-                case 'Terca':
-                    exerciciosAux[1].push(exercicio);
-                    break;
-                case 'Quarta':
-                    exerciciosAux[2].push(exercicio);
-                    break;
-                case 'Quinta':
-                    exerciciosAux[3].push(exercicio)
-                    break;
-                case 'Sexta':
-                    exerciciosAux[4].push(exercicio)
-                    break;
-            }
-            setExerciciosAdicionados(exerciciosAux);
-            setEditarNome(false);
-            setValueEx('');
+            auxExercises.map((item) => {
+                if(item.day == valueDaysDropdown){
+                    item.exercises.push(exercise)
+                }
+            })
+            setAddedExercises(auxExercises);
+            setIsNameEditable(false);
+            setValueExercisesDropdown('');
             Alert.alert("Ficha Alterada", "Exercício adicionado");
         }
-
     })
 
-    const EditarExercicioPressed = (() => {
-        if (exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0) {
+    const editExercisesPressed = (() => {
+        if (addedExercises.every(day => day.exercises.length<=0)) {
             Alert.alert("Nenhum exercício adicionado!", "Adicione um exercício primeiro")
         } else {
-            setVisibleModal(true);
-
-
+            setIsModalVisible(true);
         }
-
     })
 
-    const salvarPressed = (() => {
-        if (exerciciosAdicionados[0].length == 0 && exerciciosAdicionados[1].length == 0 && exerciciosAdicionados[2].length == 0 && exerciciosAdicionados[3].length == 0 && exerciciosAdicionados[4].length == 0) {
+    const savePressed = (() => {
+        if (addedExercises.every(day => day.exercises.length<=0)) {
             Alert.alert("Erro", "Adicione ao menos um exercício antes de salvar a ficha")
         } else {
             let objetoAux = {
-                Nome: nomeFicha,
-                Segunda: exerciciosAdicionados[0],
-                Terca: exerciciosAdicionados[1],
-                Quarta: exerciciosAdicionados[2],
-                Quinta: exerciciosAdicionados[3],
-                Sexta: exerciciosAdicionados[4],
+                Name: workoutLogName,
+                Monday: addedExercises[0].exercises,
+                Tuesday: addedExercises[1].exercises,
+                Wednesday: addedExercises[2].exercises,
+                Thursday: addedExercises[3].exercises,
+                Friday: addedExercises[4].exercises,
                 Modified: new Date().toLocaleString()
             }
-            const res = bd.collection('Fichas').doc(nomeFicha).set(objetoAux);
+            const res = bd.collection('WorkoutLogs').doc(workoutLogName).set(objetoAux);
             Alert.alert("Sucesso", "Ficha salva com sucesso");
             navigation.goBack();
         }
@@ -417,62 +228,63 @@ export default function CriarTreino({ navigation }) {
             <Text style={styles.label}>Nome da Ficha</Text>
             <TextInput
                 placeholder=""
-                onChangeText={text => setNomeFicha(text)}
+                onChangeText={text => setWorkoutLogName(text)}
                 style={styles.input}
-                editable={editarNome}
+                editable={isNameEditable}
             />
             <View style={{ width: "80%" }}>
                 <Text style={styles.label}>Selecione o dia</Text>
                 <DropDownPicker style={styles.dropdown}
                     placeholder=""
-                    open={openDias}
-                    value={valueDias}
-                    items={dias}
-                    setOpen={setOpenDias}
-                    setValue={setValueDias}
-                    setItems={setDias}
-                    onClose={() => setOpenDias(false)}
+                    open={openDaysDropdown}
+                    value={valueDaysDropdown}
+                    items={GlobalVariables.weekDays}
+                    setOpen={setOpenDaysDropdown
+            }
+                    setValue={setValueDaysDropdown}
+                    onClose={() => setOpenDaysDropdown
+                (false)}
                     theme='LIGHT'
-                    onOpen={() => { setOpenGM(false); setOpenEx(false) }}
+                    onOpen={() => { setopenMuscleGroupDropdown(false); setOpenExercisesDropdown(false) }}
                     scrollViewProps={{ nestedScrollEnabled: true }}
                 />
                 <Text style={styles.label}>Selecione um Grupo Muscular</Text>
                 <DropDownPicker style={styles.dropdown}
                     placeholder=""
-                    open={openGM}
-                    value={valueGM}
-                    items={grupoMuscular}
-                    setOpen={setOpenGM}
-                    setValue={setValueGM}
-                    setItems={setGrupoMuscular}
+                    open={openMuscleGroupDropdown}
+                    value={valueMuscleGroupDropdown}
+                    items={GlobalVariables.muscleGroups}
+                    setOpen={setopenMuscleGroupDropdown}
+                    setValue={setValueMuscleGroupDropdown}
                     theme='LIGHT'
-                    onOpen={() => { setOpenDias(false); setOpenEx(false) }}
-                    onChangeValue={(text) => { grupoMuscularSelecionado(text) }}
+                    onOpen={() => { setOpenDaysDropdown
+                (false); setOpenExercisesDropdown(false) }}
+                    onChangeValue={(valueMuscleGroupDropdown) => { selectedMuscleGroup(valueMuscleGroupDropdown) }}
                     scrollViewProps={{ nestedScrollEnabled: true }}
                 />
 
-                {exerciciosDropdown()}
+                {exercisesDropdown()}
 
             </View>
             <Text style={styles.label}>Descrição do Treino (Séries, Repetições)</Text>
             <TextInput
-                onChangeText={text => setDescricao(text)}
+                onChangeText={text => setDescription(text)}
                 style={[styles.input, styles.biggerInput]}
             />
             <View style={styles.viewBotoes}>
-                <TouchableOpacity style={styles.button} onPress={AdicionarExercicioPressed}>
+                <TouchableOpacity style={styles.button} onPress={addExercisePressed}>
                     <Text style={styles.buttonText}>
                         ADICIONAR EXERCÍCIO
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={EditarExercicioPressed}>
+                <TouchableOpacity style={styles.button} onPress={editExercisesPressed}>
                     <Text style={styles.buttonText}>
                         EDITAR EXERCÍCIOS ADICIONADOS
                     </Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.viewBotoes}>
-                <TouchableOpacity style={styles.button} onPress={() => { salvarPressed() }}>
+                <TouchableOpacity style={styles.button} onPress={() => { savePressed() }}>
                     <Text style={styles.buttonText}>
                         SALVAR
                     </Text>
@@ -484,7 +296,7 @@ export default function CriarTreino({ navigation }) {
                     </Text>
                 </TouchableOpacity>
             </View>
-            {modalEdtExercicio()}
+            {modalEditExercises()}
         </KeyboardAvoidingView>
     )
 }
@@ -508,7 +320,6 @@ const styles = StyleSheet.create({
     },
     biggerInput: {
         height: 60
-
     },
     button: {
         backgroundColor: "#F7C724",
@@ -544,7 +355,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
 
     },
-    textDescricao: {
+    textdescription: {
         fontSize: 14,
         marginLeft: 10,
         color: 'grey',

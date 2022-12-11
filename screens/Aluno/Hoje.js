@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, ScrollView, Image, TouchableOpacity, Alert, } from 'react-native';
 import ProgressBar from "../../Components/ProgressBar";
-import { firestore as bd } from "../../firebase";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import CheckBox from 'expo-checkbox';
 
-export default function Hoje({ route, navigation }) {
+export default function Hoje({route}) {
     const [progress, setProgress] = useState('0');
-    const [ficha, setFicha] = useState(route.params.ficha);
-    const [treinoDia, setTreinoDia] = useState([])
-    const dia = new Date().getDay()
+    const [workoutLog, setWorkoutLog] = useState(route.params.workoutLog);
+    const [workoutDay, setWorkoutDay] = useState('Without Workout Today')
+    let weekday = ['Sunday',
+   'Monday',
+   'Tuesday',
+  'Wednesday',
+  'Thursday',
+    'Friday',
+   'Saturday'][new Date().getDay()];   
+
     const [checkItem, setCheckItem] = useState([]);
-    var totalChecked = 0;
+    let totalChecked = 0;
 
     const handleOnChange = (position) => {
         const updatedcheckItem = checkItem.map((item, index) =>
@@ -32,51 +38,22 @@ export default function Hoje({ route, navigation }) {
     };
 
     useEffect(() => {
-        console.log(typeof ficha.ad)
-        if(ficha != 'Sem Ficha'){
-        let arrayAux = [];
-        switch (dia) {
-            case 0:
-                setTreinoDia({})
-                break;
-            case 1:
-                setTreinoDia(ficha.Segunda)
-                arrayAux = Array(Object.keys(ficha.Segunda).length).fill(false);
-                setCheckItem(arrayAux)
-                break;
-            case 2:
-                setTreinoDia(ficha.Terca)
-                arrayAux = Array(Object.keys(ficha.Terca).length).fill(false);
-                setCheckItem(arrayAux)
-                break;
-            case 3:
-                setTreinoDia(ficha.Quarta)
-                arrayAux = Array(Object.keys(ficha.Quarta).length).fill(false);
-                setCheckItem(arrayAux)
-                break;
-            case 4:
-                setTreinoDia(ficha.Quinta)
-                arrayAux = Array(Object.keys(ficha.Quinta).length).fill(false);
-                setCheckItem(arrayAux)
-                break;
-            case 5:
-                setTreinoDia(ficha.Sexta)
-                arrayAux = Array(Object.keys(ficha.Sexta).length).fill(false);
-                setCheckItem(arrayAux)
-                break;
-            case 6:
-                setTreinoDia({})
-                break;
-            default:
-                setTreinoDia({})
-                break;
-        }}
+        if(workoutLog != 'Without WLogorkout ' && workoutLog[weekday] != undefined){
+            let arrayAux = [];
+            setWorkoutDay(workoutLog[weekday])
+            arrayAux = Array(Object.keys(workoutLog[weekday]).length).fill(false);
+            setCheckItem(arrayAux)
+        }
+        else if(workoutLog[weekday] === undefined){
+            setWorkoutDay('Without Workout Today')
+        }
     }, [])
-    const renderizaLista = (() => {
-        if (treinoDia.length>0) {
+
+    const exercisesRender = (() => {
+        if (workoutDay != 'Without Workout Today') {
             return (
                 <ScrollView style={styles.scrollView}>
-                    {treinoDia.map((item, index) => {
+                    {workoutDay.map((item, index) => {
                         return (
                             <View style={styles.itemContainer} key ={index}>
                                 <TouchableOpacity style={styles.touchable} onPress={(() => { })}>
@@ -84,8 +61,8 @@ export default function Hoje({ route, navigation }) {
                                         <Ionicons name="barbell-outline" size={35} color="white" />
                                     </View>
                                     <View style={styles.viewTextos}>
-                                        <Text style={styles.textName}>{item.Exercicio}</Text>
-                                        <Text style={styles.textDescricao}>{item.Descricao} </Text>
+                                        <Text style={styles.textName}>{item.Exercise}</Text>
+                                        <Text style={styles.textDescricao}>{item.Description} </Text>
                                     </View>
                                     </TouchableOpacity>
                                     <View style={styles.viewCheckbox}>
@@ -104,7 +81,7 @@ export default function Hoje({ route, navigation }) {
 
                 </ScrollView>
             )
-        }else if(ficha == "Sem Ficha"){
+        }else if(workoutLog == "Without Workout Log"){
             return(
                 <View style={styles.viewError}>
                     <Image source={require('../../assets/botao-x.png')} style={styles.iconeErro} />
@@ -118,7 +95,7 @@ export default function Hoje({ route, navigation }) {
                 </View>
             )
 
-        } else {
+        } else if(workoutDay === 'Without Workout Today') {
             return (
                 <View style={styles.viewError}>
                     <Image source={require('../../assets/descansar-icon.png')} tintColor = '#F7C724'style={styles.iconeErro} />
@@ -141,7 +118,7 @@ export default function Hoje({ route, navigation }) {
                 HOJE
             </Text>
             <ProgressBar progress={progress} />
-            {renderizaLista()}
+            {exercisesRender()}
         </View>
     )
 }

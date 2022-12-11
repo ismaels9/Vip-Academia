@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, Modal, Alert } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View ,Image, Modal, Alert } from "react-native";
 import { firebaseAuth, firestore as bd } from '../firebase';
 import Loading from '../Components/Loading'
 import { tradutor } from '../tradutor'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaskInput from "react-native-mask-input";
-
+import {getUsers} from '../Components/Functions'
 
 export default function Login({ navigation }) {
     const [email, setEmail] = useState('');
@@ -19,24 +19,26 @@ export default function Login({ navigation }) {
     useEffect(() => {
         getData();
         if (Object.keys(loggedUser).length > 0) {
-            if (loggedUser.Tipo == 'Aluno') {
+            if (loggedUser.Role == 'Normal') {
                 navigation.replace("HomeAluno", loggedUser)
-            } else if (loggedUser.Tipo == 'Professor') {
+            } else if (loggedUser.Role == 'Professor') {
                 navigation.replace("HomeProfessor", loggedUser)
             }
         }
-    }, [loggedUser])
+    },[loggedUser])
 
     const getData = async () => {
         try {
             const jsonValue = await AsyncStorage.getItem('@loggedUserCache')
-            setLoggedUser(jsonValue != null ? JSON.parse(jsonValue) : {});
+            if(jsonValue != null){
+                setLoggedUser(JSON.parse(jsonValue))
+            }
         } catch (e) {
             Alert.alert("Erro", e.message)
         }
     }
 
-    const salvaCache = async (value) => {
+    const saveCache = async (value) => {
         try {
             const jsonValue = JSON.stringify(value);
             await AsyncStorage.setItem('@loggedUserCache', jsonValue)
@@ -46,51 +48,11 @@ export default function Login({ navigation }) {
         }
     }
 
-
-    useEffect(() => {
-        const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
-            if (user) {
-                if (loggedUser.Tipo == "Professor") {
-                    salvaCache(loggedUser);
-                    setLoadingVisible(false);
-                    navigation.replace("HomeProfessor", loggedUser);
-                }
-                else if (loggedUser.Tipo == "Aluno") {
-                    salvaCache(loggedUser);
-                    setLoadingVisible(false);
-                    navigation.replace("HomeAluno", loggedUser);
-                }
-            }
-        })
-        return unsubscribe
-    }, [loggedUser])
-
-
-    const getUser = async () => {
-        await bd.collection('Usuários').where("Email", "==", email)
-            .get()
-            .then((querySnapshot) => {
-                let usuario_adquirido = {};
-                querySnapshot.forEach((doc) => {
-                    usuario_adquirido = {
-                        id: doc.id,
-                        Nome: doc.data().Nome,
-                        Tipo: doc.data().Tipo,
-                        Email: doc.data().Email,
-                        ID_Treino: doc.data().ID_Treino,
-                        Telefone: doc.data().Telefone
-                    }
-                })
-                setLoggedUser(usuario_adquirido);
-            })
-    }
-
-
-    const entrarPressed = () => {
+    const signInPressed = () => {
         setLoadingVisible(true);
         handleLogIn();
     }
-    const registrarPressed = () => {
+    const signUpPressed = () => {
         if (name == '' || phone == '' || email == '' || password === '') {
             Alert.alert("Erro", "Por favor, preencha todos os campos")
         } else {
@@ -99,7 +61,7 @@ export default function Login({ navigation }) {
         }
     }
 
-    const jaTenhoContaPressed = () => {
+    const accountExists = () => {
         setEmail('');
         setPassword('');
         setOpenModal('false');
@@ -109,13 +71,13 @@ export default function Login({ navigation }) {
             .createUserWithEmailAndPassword(email, password)
             .then(userCredentials => {
                 const dadosCadastro = {
-                    Nome: name,
-                    Telefone: phone,
+                    Name: name,
+                    Telephone: phone,
                     Email: email,
-                    Tipo: "Aluno",
-                    ID_Treino: "",
+                    Role: "Normal",
+                    WorkoutLog: "",
                 }
-                const res = bd.collection('Usuários').doc(email).set(dadosCadastro);
+                const res = bd.collection('Users').doc(email).set(dadosCadastro);
                 handleLogIn()
             })
             .catch(error => {
@@ -123,19 +85,18 @@ export default function Login({ navigation }) {
                 setLoadingVisible(false)
             })
     }
-    const handleLogIn = () => {
-        console.log('aqui')
+    const handleLogIn = async () => {
+        let aux = await getUsers(email, '')
         firebaseAuth
             .signInWithEmailAndPassword(email, password)
             .then(userCredentials => {
-                console.log('aqui2')
-
-                getUser();
-                const user = userCredentials.user;
+                if(typeof aux != 'string'){
+                    setLoggedUser(aux);
+                    const user = userCredentials.user;
+                    saveCache(aux)
+                }
             })
             .catch(error => {
-                console.log('aqui3')
-
                 Alert.alert("Erro", tradutor(error.code, error.message))
                 setLoadingVisible(false);
             })
@@ -189,7 +150,7 @@ export default function Login({ navigation }) {
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    onPress={entrarPressed}
+                    onPress={signInPressed}
                     style={styles.button}>
                     <Text style={styles.buttonText}>Entrar</Text>
                 </TouchableOpacity>
@@ -234,12 +195,12 @@ export default function Login({ navigation }) {
                         style={styles.input}
                         secureTextEntry />
                     <TouchableOpacity
-                        onPress={registrarPressed}
+                        onPress={signUpPressed}
                         style={[styles.buttonRegister]}>
                         <Text style={styles.buttonText}>Registrar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={jaTenhoContaPressed}
+                        onPress={accountExists}
                         style={[styles.button, styles.buttonOutline]}>
                         <Text style={styles.buttonOutlineText}>Já tenho conta</Text>
                     </TouchableOpacity>

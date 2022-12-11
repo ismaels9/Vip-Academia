@@ -1,27 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Modal, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { firestore as bd } from "../firebase"
 
 export default function DialogWithList(props) {
-    const [dropdownList, setDropdownList] = useState([]);
+    const [dropdownList, setDropdownList] = useState(props.workoutLogs);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true)
 
-    useState(() => {
-        let exerciseSheetArray = []
-        props.exerciseSheet.forEach((item) => {
-            let exerciseSheet = { label: item.Name, value: item.Name }
-            exerciseSheetArray.push(exerciseSheet)
-        })
-        setDropdownList(exerciseSheetArray)
-
-    }, []);
+    useEffect (() => {
+        console.log(dropdownList)
+    }, [])
 
     const SaveButtonPressed = ((value) => {
-        bd.collection('Usuários').doc(props.user.Email).update({ ID_Treino: value });
+        bd.collection('Users').doc(props.user.Email).update({ WorkoutLog: value });
         Alert.alert("Treino Alterado", "Ficha atribuida à aluno com sucesso")
         props.Close()
     })

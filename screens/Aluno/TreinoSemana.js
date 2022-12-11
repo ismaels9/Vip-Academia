@@ -1,38 +1,27 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Text, ScrollView, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import GlobalVariables from '../../Components/GlobalVariables'
 
-export default function Hoje({ route, navigation }) {
-    const [ficha, setFicha] = useState(route.params.ficha);
-    const [selectedDay, setSelectedDay] = useState({ index: 0, fichaDia: ficha.Segunda })
-    const [backColor, setBackColor] = useState([styles.backColorYellow, styles.backColorGray, styles.backColorGray, styles.backColorGray, styles.backColorGray])
+export default function Hoje({ route }) {
+    const [workoutLog, setWorkoutLog] = useState(route.params.workoutLog);
+    const [workoutSelectedDay, setWorkoutSelectedDay] = useState(workoutLog.Monday)
+    const [selectedDay, setSelectedDay] = useState('Monday')
 
 
     const handleClick = ((item) => {
-        let aux = backColor.fill(styles.backColorGray)
-        aux[item] = styles.backColorYellow
-        setBackColor(aux)
-        switch (item) {
-            case 0:
-                setSelectedDay({ index: 0, fichaDia: ficha.Segunda })
-                break;
-            case 1:
-                setSelectedDay({ index: 1, fichaDia: ficha.Terca })
-                break;
-            case 2:
-                setSelectedDay({ index: 2, fichaDia: ficha.Quarta })
-                break;
-            case 3:
-                setSelectedDay({ index: 3, fichaDia: ficha.Quinta })
-                break;
-            case 4:
-                setSelectedDay({ index: 4, fichaDia: ficha.Sexta })
-                break;
-
-        }
+        setSelectedDay(item)
+        setWorkoutSelectedDay(workoutLog[item])
     })
 
+    function isSelected(dayPressed){
+        if(dayPressed == selectedDay){
+            return styles.backColorYellow
+        }
+        return styles.backColorGray
+    }
+
     const renderizaLista = (() => {
-        if (ficha == 'Sem Ficha') {
+        if (workoutLog == 'Without Workout Log') {
             return (
                 <View style={styles.viewError}>
                     <Image source={require('../../assets/botao-x.png')} style={styles.iconeErro} />
@@ -57,19 +46,19 @@ export default function Hoje({ route, navigation }) {
                             <Text style={styles.textName}>ínicio do treino</Text>
                         </View>
                     </View>
-                    {selectedDay.fichaDia.map((item, index) => {
+                    {workoutSelectedDay.map((item, index) => {
                         return (
                             <View style={styles.itemsContainer} key={index}>
-                            <View style={styles.simbolos}>
-                                <Image source={require('../../assets/dashed-circle.png')} style={styles.circle} tintColor='#f7c724' />
-                                <Image source={require('../../assets/vertical-line.png')} style={styles.circle} tintColor='#f7c724' />
-                            </View>
-                            <View style={styles.textos}>
-                                <Text style={styles.textName}>{item.Exercicio}</Text>
-                                <Text style={styles.textDescricao}>{item.Descricao}</Text>
+                                <View style={styles.simbolos}>
+                                    <Image source={require('../../assets/dashed-circle.png')} style={styles.circle} tintColor='#f7c724' />
+                                    <Image source={require('../../assets/vertical-line.png')} style={styles.circle} tintColor='#f7c724' />
+                                </View>
+                                <View style={styles.textos}>
+                                    <Text style={styles.textName}>{item.Exercise}</Text>
+                                    <Text style={styles.textDescricao}>{item.Description}</Text>
 
+                                </View>
                             </View>
-                        </View>
                         )
                     })}
                     <View style={styles.itemsContainer}>
@@ -89,23 +78,15 @@ export default function Hoje({ route, navigation }) {
         <SafeAreaView style={styles.view}>
             <Image source={require('../../assets/logo.jpg')} style={styles.logo} />
             <ScrollView horizontal={true} style={styles.scrollView}>
-                <TouchableOpacity style={[styles.viewDay, backColor[0]]} onPress={() => { handleClick(0) }}>
-                    <Text style={styles.textDays}>Segunda-Feira</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.viewDay, backColor[1]]} onPress={() => { handleClick(1) }}>
-                    <Text style={styles.textDays}>Terça-Feira</Text>
-                </TouchableOpacity >
-                <TouchableOpacity style={[styles.viewDay, backColor[2]]} onPress={() => { handleClick(2) }}>
-                    <Text style={styles.textDays}>Quarta-Feira</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.viewDay, backColor[3]]} onPress={() => { handleClick(3) }}>
-                    <Text style={styles.textDays}>Quinta-Feira</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.viewDay, backColor[4]]} onPress={() => { handleClick(4) }}>
-                    <Text style={styles.textDays}>Sexta-Feira</Text>
-                </TouchableOpacity>
-            </ScrollView>
+                {GlobalVariables.weekDays.map((item, index) => {
+                    return(
+                    <TouchableOpacity style={[styles.viewDay, isSelected(item.value)]} onPress={() => {handleClick(item.value) }} key={index}>
+                        <Text style={styles.textDays}>{item.label}</Text>
+                    </TouchableOpacity>
+                    )
 
+                })}
+            </ScrollView>
             {renderizaLista()}
 
         </SafeAreaView>
@@ -189,10 +170,9 @@ const styles = StyleSheet.create({
     itemsContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        MinWidth: '80%',
-        maxHeight: 80,
+        minWidth: '80%',
         maxWidth: '80%',
-        justifyContent: 'flex-start'
+        justifyContent: 'flex-start',
     },
     textName: {
         color: 'white',
@@ -207,7 +187,7 @@ const styles = StyleSheet.create({
     simbolos: {
         alignItems: 'center',
     },
-    textos:{
+    textos: {
         alignSelf: 'flex-start',
         paddingTop: 5
 

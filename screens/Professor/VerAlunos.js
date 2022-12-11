@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import { firestore as bd } from '../../firebase'
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getUsers } from "../../Components/Functions";
 
 export default function VerAlunos({navigation}) {
-    const [alunos, setAlunos] = useState([]);
-    const [filteredAlunos, setFilteredAlunos] = useState([]);
-
-
+    const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
     useEffect(() => {
         navigation.setOptions({
             headerLargeTitle: true,
@@ -24,48 +23,35 @@ export default function VerAlunos({navigation}) {
     ,[]})
 
     useEffect(() => {
-        getUsers()
-    }, [])
-    const getUsers = async () => {
-        await bd.collection('Usuários').where("Tipo", '==', "Aluno")
-            .get()
-            .then((querySnapshot) => {
-                let usuarios_adquiridos = [];
-                querySnapshot.forEach((doc) => {
-                    let usuario_adquirido = {
-                        id: doc.id,
-                        Nome: doc.data().Nome,
-                        Tipo: doc.data().Tipo,
-                        Email: doc.data().Email,
-                        Treino: doc.data().ID_Treino,
-                        Telefone: doc.data().Telefone,
-                    }
-                    usuarios_adquiridos.push(usuario_adquirido);
-                })
-                usuarios_adquiridos.sort((a,b) => a.Nome < b.Nome)
-                usuarios_adquiridos.sort((a,b) => a.ID_Treino > b.ID_Treino)
-                setAlunos(usuarios_adquiridos);
-                setFilteredAlunos(usuarios_adquiridos);
-            }).catch(error => {
-                Alert.alert("Erro",error.code, error.message)
-            })
-    }
+        getData()
+        }, [])
+
+    const getData = (async() => {
+        let aux = await getUsers('all', 'Normal')
+        if(aux == 'No matching documents.'){
+            Alert.alert("Sem alunos cadastrados", "Não existem alunos cadastrados")
+            navigation.goBack()
+        }
+        aux.sort((a,b) => a.Name > b.Name)
+        setUsers(aux)
+        setFilteredUsers(aux)
+    }) 
 
     const searchFilterFunction = (text) => {
         if (text) {
-            const newData = alunos.filter(item => {
-                const itemData = item.Nome ? item.Nome.toUpperCase() : ''.toUpperCase();
+            const newData = users.filter(item => {
+                const itemData = item.Name ? item.Name.toUpperCase() : ''.toUpperCase();
                 const textData = text.toUpperCase();
                 return itemData.indexOf(textData) > -1;
             })
-            setFilteredAlunos(newData);
+            setFilteredUsers(newData);
 
         } else {
-            setFilteredAlunos(alunos);
+            setFilteredUsers(users);
         }
     }
 
-    const treinoAluno = ((item) => {
+    const userWorkoutLog = ((item) => {
         if(item == ""){
             return(
             <Text style={{fontSize: 14, marginLeft: 10, color: 'red',}}>Ficha Associada: Aluno sem treino</Text>
@@ -79,7 +65,7 @@ export default function VerAlunos({navigation}) {
 
     })
 
-    const apertouAluno = ((aluno_clicado) => {
+    const userPressed = ((pressedUser) => {
         Alert.alert(
             "Selecione uma opção",
             "Você deseja editar a ficha do aluno ou excluir o aluno?",
@@ -100,12 +86,12 @@ export default function VerAlunos({navigation}) {
                                 {
                                     text: "SIM",
                                     onPress: (() => {
-                                        try{
-                                            const res = bd.collection('Usuários').doc(aluno_clicado.id).delete();
+                                        try {
+                                            const res = bd.collection('Users').doc(pressedUser.id).delete();
                                             Alert.alert("Sucesso", "Aluno excluído com sucesso");
                                             navigation.goBack();
 
-                                        }catch(e){
+                                        } catch (e) {
                                             Alert.alert("Erro", e.message)
                                         }
                                     }),
@@ -120,25 +106,22 @@ export default function VerAlunos({navigation}) {
         );
 
     })
-
-
     return(
-
         <ScrollView style={styles.view}>
 
-            {filteredAlunos.map((item, index) => {
+            {filteredUsers.map((item, index) => {
                 return (
-                    <TouchableOpacity key={index} style={styles.itemContainer} onPress={() => apertouAluno(item)}>
+                    <TouchableOpacity key={index} style={styles.itemContainer} onPress={() => userPressed(item)}>
                         <Ionicons name="person-outline" size={35} color="white" />
                         <View>
-                            <Text style={styles.textName}>{item.Nome}</Text>
+                            <Text style={styles.textName}>{item.Name}</Text>
                             <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems:'center', marginLeft: 10,}}>
                             <Ionicons name="at-outline" size={15} color="#F7C724" />
                                 <Text style={styles.textEmail}>{item.Email}   </Text>
                                 <Ionicons name="call-outline" size={15} color="#F7C724" />
-                                <Text style={styles.textEmail}>{item.Telefone}</Text>
+                                <Text style={styles.textEmail}>{item.Telephone}</Text>
                             </View>
-                            {treinoAluno(item.Treino)}
+                            {userWorkoutLog(item.WorkoutLog)}
                             </View>
                     </TouchableOpacity>
 

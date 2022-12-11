@@ -10,6 +10,7 @@ import VerAlunos from './screens/Professor/VerAlunos';
 import CriarTreino from './screens/Professor/CriarTreino';
 import EditarFichaJaCriada from './screens/Professor/EditarFichaJaCriada';
 import VerTreino from './screens/Professor/VerTreino';
+import ChangeTheLife from './ChangeTheLife';
 
 const Stack = createNativeStackNavigator();
 
