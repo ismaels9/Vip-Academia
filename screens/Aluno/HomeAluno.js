@@ -36,11 +36,17 @@ const HomeAluno = ({ route, navigation }) => {
                 updateCache('@workoutLogCache', workoutLog)
                 updateLastLogin()
             } else {
-                setWorkoutLog(getCacheData('@workoutLogCache'))
-                setDataFetched(true)
+                getCache()
             }
         })
     }, [])
+
+    const getCache = (async ()=> {
+        let aux = await getCacheData()
+        setWorkoutLog(aux)
+        setDataFetched(true)
+
+    })
 
     const updateLastLogin =(() => {
         bd.collection('Users').doc(loggedUser.Email).update({ LastLogin: new Date().toLocaleDateString('pt-BR')})
@@ -60,7 +66,7 @@ const HomeAluno = ({ route, navigation }) => {
         try {
             const jsonValue = await AsyncStorage.getItem(variable)
             if(jsonValue != null){
-                setLoggedUser(JSON.parse(jsonValue))
+                return jsonValue
             }
         } catch (e) {
             Alert.alert("Erro", e.message)

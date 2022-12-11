@@ -76,7 +76,6 @@ export default function Hoje({ route }) {
             });
     })
 
-
     return (
         <SafeAreaView style={styles.view}>
             <Loading visible={loadingVisible} />
